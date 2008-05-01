@@ -1,5 +1,5 @@
 <ul class="your_projects">
-  <% for project in ProjectPermission.find_all_projects_for_user( current_user ) -%>
+  <% user.projects.each do |project| -%>
     <li>
       <%= link_to project.name, project_path( project ) %>
     </li>

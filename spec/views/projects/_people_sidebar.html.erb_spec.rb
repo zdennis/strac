@@ -2,7 +2,6 @@ require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe "/projects/_people_sidebar.html.erb" do
   def render_it
-    assigns[:project] = @project
     render :partial => "projects/people_sidebar", :locals => { :project => @project }
   end
 
