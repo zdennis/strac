@@ -46,7 +46,7 @@ describe "/projects/_sidebar.html.erb" do
   it "renders the projects/user_sidebar partial" do
     template.expect_render(
       :partial => "projects/user_sidebar",
-      :locals => { :project => @project }
+      :locals => { :user => @user }
     ).and_return(%|<p id="user-partial" />|)
     render_it
     response.should have_tag('p#user-partial')    

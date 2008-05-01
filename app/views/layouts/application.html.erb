@@ -49,7 +49,7 @@
 
       <div id="innerinnerwrapper" class="clearfix">
         <% if current_user -%>
-          <%= render :partial => "projects/sidebar", :locals => { :project => @project } %>
+          <%= render :partial => "projects/sidebar", :locals => { :project => @project, :user => current_user } %>
         <% end -%>
 
         <div id="content">
