@@ -10,9 +10,32 @@ describe StoriesController, '#reorder' do
     @project = mock_model(Project)
     @story_ids = [ "3", "2", "", "1"]
     @page = stub("page", :delay => nil, :visual_effect => nil, :replace_html => nil, :replace => nil, :hide => nil, :show => nil )
-    controller.expect_render(:update).and_yield(@page)
     Story.stub!(:import)
     ProjectPermission.stub!(:find_project_for_user).and_return(@project)
+  end
+
+  it "finds and assigns the @project for the requested story" do
+    ProjectPermission.should_receive(:find_project_for_user).with(@project.id.to_s, @user).and_return(@project)
+    xhr_put_reorder
+    assigns[:project].should == @project
+  end
+  
+  describe "when a project can't be found" do
+    before do
+      ProjectPermission.stub!(:find_project_for_user).and_return(nil)
+    end
+    
+    it "tells the user they don't have access" do
+      page = mock("page")
+      controller.expect_render(:update).and_yield(page)
+      page.should_receive(:replace_html).with(:error, "You don't have access to do that or the resource doesn't exist.")
+      page.should_receive(:hide).with(:notice)
+      page.should_receive(:show).with(:error)
+      page.should_receive(:visual_effect).with(:appear, :error)
+      page.should_receive(:delay).with(5).and_yield
+      page.should_receive(:visual_effect).with(:fade, :error)
+      xhr_put_reorder
+    end
   end
 
   it "reorders the stories" do
@@ -26,6 +49,10 @@ describe StoriesController, '#reorder' do
   end
   
   describe "when reordering the stories is successful" do
+    before do
+      controller.expect_render(:update).and_yield(@page)
+    end
+
     it "tells the user the story was updated" do
       @page.should_receive(:replace_html).with(:notice, "Priorities have been successfully updated.")
       @page.should_receive(:hide).with(:error)
@@ -39,6 +66,7 @@ describe StoriesController, '#reorder' do
   
   describe "when reordering the stories is not successful" do
     before do
+      controller.expect_render(:update).and_yield(@page)
       Story.stub!(:import).and_raise(StandardError)
     end
 

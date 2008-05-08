@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe StoriesController, "user with privileges requesting #index " do
   def get_index(attrs={})
-    get :index, {:project_id=>'1'}.merge(attrs), {:current_user_id=>2}    
+    get :index, {:project_id=>@project.id}.merge(attrs), {:current_user_id=>2}    
   end
 
   before do
@@ -15,10 +15,22 @@ describe StoriesController, "user with privileges requesting #index " do
     ProjectPermission.stub!(:find_project_for_user).and_return(@project)
   end
 
-  it "returns successful" do
+  it "finds and assigns the @project for the requested story" do
+    ProjectPermission.should_receive(:find_project_for_user).with(@project.id.to_s, @user).and_return(@project)
     get_index
-    response.should be_success
+    assigns[:project].should == @project
   end
+  
+  describe "when a project can't be found" do
+    before do
+      ProjectPermission.stub!(:find_project_for_user).and_return(nil)
+    end
+    
+    it "redirects to access_denied" do
+      get_index
+      response.should redirect_to("/access_denied.html")
+    end
+  end  
 
   it "creates a StoriesIndexPresenter" do
     StoriesIndexPresenter.should_receive(:new).with(

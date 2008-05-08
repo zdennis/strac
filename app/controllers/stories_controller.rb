@@ -15,13 +15,11 @@ class StoriesController < ApplicationController
   def show
     @story = @project.stories.find(params[:id], :include => [:tags, :comments] )
     @comments = @story.comments
-    should_render_comment_links = false
-
     respond_to :html, :js
   end
 
   def new
-    @story = @project.stories.build :bucket_id => params[:bucket_id]
+    @story = @project.stories.build
     respond_to :js
   end
   
@@ -35,17 +33,10 @@ class StoriesController < ApplicationController
 
   def create
     @story = @project.stories.build(params[:story])
-
+    find_priorities_and_statuses
     respond_to do |format|
-      if @story.save
-        format.js do
-          find_priorities_and_statuses
-        end
-      else
-        format.js do
-          find_priorities_and_statuses
-          render :action => "new"
-        end
+      format.js do
+        render :action => "stories/new" unless @story.save
       end
     end
   end
@@ -178,7 +169,11 @@ private
 
   def find_project
     unless @project=ProjectPermission.find_project_for_user(params[:project_id], current_user)
-      redirect_to "/access_denied.html"
+      if request.xhr?
+        render_error "You don't have access to do that or the resource doesn't exist."
+      else
+        redirect_to "/access_denied.html"
+      end
       false
     end
   end

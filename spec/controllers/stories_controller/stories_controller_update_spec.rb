@@ -2,21 +2,55 @@ require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe StoriesController, '#update' do
   def put_update(attrs={})
-    put :update, {:project_id => '1', :id => '2', :story => @story_params}.merge(attrs)
+    put :update, {:project_id => @project.id, :id => @story.id, :story => @story_params}.merge(attrs)
+  end
+
+  def xhr_put_update(attrs={})
+    xhr :put, :update, {:project_id => @project.id, :id => @story.id, :story => @story_params}.merge(attrs)
   end
   
   before do
-    stub_login_for StoriesController
-    @story = stub("story", :update_attributes => true, :summary => "foo")
+    @user = stub_login_for StoriesController
+    @story = mock_model(Story, :update_attributes => true, :summary => "foo")
     @stories = stub("stories", :find => @story)
-    @project = stub("project", :stories => @stories)
+    @project = mock_model(Project, :stories => @stories)
     @story_params = { 'summary' => 'foo' }
     ProjectPermission.stub!(:find_project_for_user).and_return(@project)
   end
+
+  it "finds and assigns the @project for the requested story" do
+    ProjectPermission.should_receive(:find_project_for_user).with(@project.id.to_s, @user).and_return(@project)
+    put_update
+    assigns[:project].should == @project
+  end
+  
+  describe "when a project can't be found" do
+    before do
+      ProjectPermission.stub!(:find_project_for_user).and_return(nil)
+    end
+    
+    it "redirects to access_denied.html on an html request" do
+      put_update
+      response.should redirect_to("/access_denied.html")
+    end
+    
+    it "tells the user they don't have access on an xhr request" do
+      page = mock("page")
+      controller.expect_render(:update).and_yield(page)
+      page.should_receive(:replace_html).with(:error, "You don't have access to do that or the resource doesn't exist.")
+      page.should_receive(:hide).with(:notice)
+      page.should_receive(:show).with(:error)
+      page.should_receive(:visual_effect).with(:appear, :error)
+      page.should_receive(:delay).with(5).and_yield
+      page.should_receive(:visual_effect).with(:fade, :error)
+      xhr_put_update
+    end
+
+  end  
   
   it "finds the requested story" do
     @project.should_receive(:stories).and_return(@stories)
-    @stories.should_receive(:find).with('2', :include => :tags).and_return(@story)
+    @stories.should_receive(:find).with(@story.id.to_s, :include => :tags).and_return(@story)
     put_update
   end
   
@@ -50,7 +84,7 @@ describe StoriesController, '#update' do
   
     describe StoriesController, 'xhr request' do
       it "renders the 'update.js.rjs' template" do
-        xhr :put, :update, :project_id => '1', :id => '2', :story => @story_params
+        xhr_put_update
         response.should render_template('stories/update.js.rjs')
       end
     end
@@ -70,35 +104,27 @@ describe StoriesController, '#update' do
   
     describe StoriesController, 'xhr request' do
       before do
-        @statuses = [stub("status1", :id => 1, :name => "a"), stub("status2", :id => 2, :name => "b")]
-        Status.stub!(:find).and_return(@statuses)
-        @priorities = [stub("priority1", :id => 1, :name => "f"), stub("priority2", :id => 2, :name => "g")]
-        Priority.stub!(:find).and_return(@priorities)
+        Status.stub!(:find).and_return([])
+        Priority.stub!(:find).and_return([])
       end
       
       it "renders the 'edit.js.rjs' template" do
-        xhr :put, :update, :project_id => '1', :id => '2', :story => @story_params
+        xhr_put_update
         response.should render_template('stories/edit.js.rjs')
       end
 
-      it "finds all statuses" do
-        Status.should_receive(:find).with(:all).and_return(@statuses)
-        xhr :put, :update, :project_id => '1', :id => '2', :story => @story_params
+      it "finds all statuses and assigns them to @statuses" do
+        statuses = [mock_model(Status, :name => "a"), mock_model(Status, :name => "b")]
+        Status.should_receive(:find).with(:all).and_return(statuses)
+        xhr_put_update
+        assigns[:statuses].should == [[], [statuses.first.name, statuses.first.id ], [statuses.last.name, statuses.last.id]]
       end
-      
-      it "assigns @statuses" do
-        xhr :put, :update, :project_id => '1', :id => '2', :story => @story_params
-        assigns[:statuses].should == [[], ["a", 1], ["b", 2]]
-      end
-      
-      it "finds all priorities" do
-        Priority.should_receive(:find).with(:all).and_return(@priorities)
-        xhr :put, :update, :project_id => '1', :id => '2', :story => @story_params
-      end
-      
-      it "assigns @priorities" do
-        xhr :put, :update, :project_id => '1', :id => '2', :story => @story_params
-        assigns[:priorities].should == [[], ["f", 1], ["g", 2]]
+    
+      it "finds all priorities and assigns them to @priorities" do
+        priorities = [mock_model(Priority, :name => "foo"), mock_model(Priority, :name => "bar")]
+        Priority.should_receive(:find).with(:all).and_return(priorities)
+        xhr_put_update
+        assigns[:priorities].should == [[], [priorities.first.name, priorities.first.id], [priorities.last.name, priorities.last.id]]
       end
     end
 
