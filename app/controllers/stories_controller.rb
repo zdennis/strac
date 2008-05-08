@@ -3,7 +3,7 @@ class StoriesController < ApplicationController
   
   in_place_edit_for :story, :points
   
-  before_filter :find_project, :except => [ :update_points ]
+  before_filter :find_project
   before_filter :find_priorities_and_statuses, :only => [ :new, :edit ]
 
   helper :comments
@@ -126,19 +126,15 @@ class StoriesController < ApplicationController
   
   def update_points
     render :update do |page|
-      project_manager = ProjectManager.new(params[:project_id], current_user)
-      project_manager.update_story_points(params[:id], params[:story][:points]) do |story_update|
-        story_update.success do |story|
-          project = story.project
-          renderer = RemoteProjectRenderer.new(:page => page, :project => project)
+      if story=@project.stories.find(params[:id])
+        if story.update_attribute(:points, params[:story][:points])
+          renderer = RemoteProjectRenderer.new(:page => page, :project => @project)
           renderer.render_notice %("#{story.summary} was successfully updated.")
           renderer.update_story_points(story)
           renderer.update_project_summary
           renderer.draw_current_iteration_velocity_marker
-        end
-        
-        story_update.failure do |story|
-          renderer = RemoteProjectRenderer.new(:page => page, :project => story.project)
+        else
+          renderer = RemoteProjectRenderer.new(:page => page, :project => @project)
           renderer.render_error %("#{story.summary}" was not successfully updated.)
         end
       end

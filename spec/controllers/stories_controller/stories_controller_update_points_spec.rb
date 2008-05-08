@@ -6,15 +6,11 @@ describe StoriesController, '#update_points' do
   end
   
   before do
-    stub_before_filters! :except => [:find_project]
-    stub_login_for StoriesController
-    @project = mock_model(Project)
-    @project_manager = stub("project manager instance", :update_story_points => nil)
-    @story = mock_model(Story, :project => @project, :summary => "FooBaz")
+    @user = stub_login_for StoriesController
+    @story = mock_model(Story, :summary => "FooBaz", :update_attribute => nil)
+    @stories = mock("stories", :find => @story)
+    @project = mock_model(Project, :stories => @stories)
     @points = '11'
-    @story_update = stub("story_update", :success => nil, :failure => nil)
-    ProjectManager.stub!(:new).and_return(@project_manager)
-    @project_manager.stub!(:update_story_points).and_yield(@story_update)
     @page = stub("page")
     controller.expect_render(:update).and_yield(@page)
     @remote_project_renderer = stub("remote project renderer", 
@@ -25,28 +21,26 @@ describe StoriesController, '#update_points' do
       :draw_current_iteration_velocity_marker => nil
     )
     RemoteProjectRenderer.stub!(:new).and_return(@remote_project_renderer)    
-  end
-
-  it "builds a ProjectManager for the current project and user" do
-    ProjectManager.should_receive(:new).with(@project.id.to_s, @user).and_return(@project_manager)
-    xhr_update_points
+    ProjectPermission.stub!(:find_project_for_user).and_return(@project)
   end
   
-  it "asks the newly built project manager to update the points on the requested story" do
-    @project_manager.should_receive(:update_story_points).with(@story.id.to_s, @points.to_s)
+  it "finds the project for the requested story" do
+    ProjectPermission.should_receive(:find_project_for_user).with(@project.id.to_s, @user).and_return(@project)
+    xhr_update_points
+  end  
+
+  it "updates the points on the requested story" do
+    @project.should_receive(:stories).and_return(@stories)
+    @stories.should_receive(:find).with(@story.id.to_s).and_return(@story)
+    @story.should_receive(:update_attribute).with(:points, @points)
     xhr_update_points
   end
   
   describe "when the update is successful" do
     before do
-      @story_update.stub!(:success).and_yield(@story)
+      @story.stub!(:update_attribute).and_return(true)
     end
     
-    it "asks the story for its project" do
-      @story.should_receive(:project).and_return(@project)
-      xhr_update_points
-    end
-        
     it "builds a RemoteProjectRenderer for the project" do
       RemoteProjectRenderer.should_receive(:new).with(:page => @page, :project => @project).and_return(@remote_project_renderer)
       xhr_update_points
@@ -78,11 +72,6 @@ describe StoriesController, '#update_points' do
       @story_update.stub!(:failure).and_yield(@story)
     end
 
-    it "asks the story for its project" do
-      @story.should_receive(:project).and_return(@project)
-      xhr_update_points
-    end
-        
     it "builds a RemoteProjectRenderer for the project" do
       RemoteProjectRenderer.should_receive(:new).with(:page => @page, :project => @project).and_return(@remote_project_renderer)
       xhr_update_points
