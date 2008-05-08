@@ -38,17 +38,13 @@ class ProjectsController < ApplicationController
   end
 
   def update
-    ProjectManager.update_project_for_user(params[:id], current_user, params[:project], params[:users]) do |project_update|
-      project_update.success do |project|
-        @project = project
-        flash[:notice] = 'Project was successfully updated.'
-        redirect_to project_path(@project)
-      end
-      
-      project_update.failure do |project|
-        @project = project
-        render :action => "edit"
-      end
+    @project = ProjectPermission.find_project_for_user(params[:id], current_user)
+    if @project && @project.update_attributes(params[:project])
+      @project.update_members params[:users]
+      flash[:notice] = 'Project was successfully updated.'
+      redirect_to project_path(@project)
+    else
+      render :action => "edit"
     end
   end
 

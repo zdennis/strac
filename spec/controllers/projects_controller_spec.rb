@@ -174,74 +174,63 @@ describe ProjectsController, '#update' do
     @project = mock_model(Project)
     @project_params = { 'name' => "Project HRM" }
     @users_params = [1,2,3,4]
-    ProjectManager.stub!(:update_project_for_user)
+    ProjectPermission.stub!(:find_project_for_user)
   end
   
-  it "asks the ProjectManager to update the project for the current user" do
-    ProjectManager.should_receive(:update_project_for_user).with(@project.id.to_s, @user, @project_params, @users_params)
+  it "finds the requested project for the current user" do
+    ProjectPermission.should_receive(:find_project_for_user).with(@project.id.to_s, @user)
     put_update
   end
   
-  describe "when a user with proper privileges updates a project" do
+  describe "the project is found" do
     before do
-      @project_update = stub("project update", :success => nil, :failure => nil)
-      ProjectManager.stub!(:update_project_for_user).and_yield(@project_update)
-      @project_update.stub!(:failure).and_yield(@project)
+      ProjectPermission.stub!(:find_project_for_user).and_return(@project)
+      @project.stub!(:update_attributes).with(@project_params)
     end
+    
+    it "assigns @project" do
+      put_update
+      assigns[:project].should == @project
+    end    
 
-    describe "when the project successfully updates" do
+    it "updates the project" do
+      @project.should_receive(:update_attributes).with(@project_params)
+      put_update
+    end
+    
+    describe "when the project updates successfully" do
       before do
-        @project_update.stub!(:success).and_yield(@project)
-        @project_update.stub!(:failure)
+        @project.stub!(:update_attributes).and_return(true)
+        @project.stub!(:update_members)
       end
 
-      it "assigns the @project to passed in project" do
+      it "updates the project's members" do
+        @project.should_receive(:update_members).with(@users_params)
         put_update
-        assigns[:project].should == @project
-      end    
-    
+      end
+
       it "sets the flash[:notice] telling the user the project was updated" do
         put_update
         flash[:notice].should == 'Project was successfully updated.'
       end
-      
-      describe "when the request is an html request" do
-        it "redirects to the project page" do
-          put_update
-          response.should redirect_to(project_path(@project))
-        end
+
+      it "redirects to the project page" do
+        put_update
+        response.should redirect_to(project_path(@project))
       end
     end
     
     describe "when the project fails to update" do
       before do
-        @project_update.stub!(:failure).and_yield(@project)
+        @project.stub!(:update_attributes).with(@project_params).and_return(false)
       end
-      
-      it "assigns the @project to passed in project" do
-        put_update
-        assigns[:project].should == @project
-      end      
 
-      describe "when the request is an html request" do
-        it "renders the projects/edit template" do
-          put_update
-          response.should render_template("projects/edit")
-        end
+      it "renders the projects/edit template" do
+        put_update
+        response.should render_template("projects/edit")
       end
     end
-  end
-  
-  describe "when a user without proper privileges tries to update a project" do
-    before do
-      ProjectManager.stub!(:update_project_for_user).and_raise(AccessDenied)
-    end
-    
-    it "redirects to the access denied page" do
-      put_update
-      response.should redirect_to("/access_denied.html")
-    end
-  end
+  end  
 end
 
 describe ProjectsController, '#edit' do
@@ -256,7 +245,7 @@ describe ProjectsController, '#edit' do
     ProjectPermission.stub!(:find_project_for_user).and_return(@project)
   end
   
-  it "asks the ProjectPermission for the project for the current the current user" do
+  it "finds the requested project for the current user" do
     ProjectPermission.should_receive(:find_project_for_user).with(@project.id.to_s, @user)
     get_edit
   end
@@ -298,7 +287,7 @@ describe ProjectsController, '#destroy' do
     ProjectPermission.stub!(:find_project_for_user).and_return(@project)
   end
 
-  it "asks the ProjectPermission for the project for the current the current user" do
+  it "finds the requested project for the current user" do
     ProjectPermission.find_project_for_user(@project.id.to_s, @user)
     delete_destroy
   end
