@@ -59,26 +59,6 @@ class Story < ActiveRecord::Base
     !complete?
   end
   
-  #TODO: Is there a better way to put this into a single SQL statement?
-  def self.reorder ids, options={}
-    options = options.symbolize_keys
-    raise ArgumentError.new("bucket_id is required") unless options.has_key?(:bucket_id)
-    
-    bucket_id = options[:bucket_id]
-    values = []
-    counter = 0
-    ids.each do |id|
-      unless id.blank?
-        values << [id, counter+=1, bucket_id]
-      end
-    end
-    
-    columns2import = [:id, :position, :bucket_id]
-    columns2update = [:position, :bucket_id]
-    Story.import( columns2import, values, :on_duplicate_key_update=>columns2update, :validate=>false )
-    true
-  end
-  
   def self.find_backlog options = {}
     with_scope :find => options do
       find :all, :conditions => "bucket_id IS NULL"

@@ -11,16 +11,11 @@ describe StoriesController, '#update_points' do
     @stories = mock("stories", :find => @story)
     @project = mock_model(Project, :stories => @stories)
     @points = '11'
-    @page = stub("page")
+    
+    @page = stub("page", :delay => nil, :visual_effect => nil, :call => nil,
+      :replace_html => nil, :replace => nil, :hide => nil, :show => nil )
+
     controller.expect_render(:update).and_yield(@page)
-    @remote_project_renderer = stub("remote project renderer", 
-      :update_project_summary => nil, 
-      :update_story_points => nil, 
-      :render_notice => nil,
-      :render_error => nil,
-      :draw_current_iteration_velocity_marker => nil
-    )
-    RemoteProjectRenderer.stub!(:new).and_return(@remote_project_renderer)    
     ProjectPermission.stub!(:find_project_for_user).and_return(@project)
   end
   
@@ -39,46 +34,53 @@ describe StoriesController, '#update_points' do
   describe "when the update is successful" do
     before do
       @story.stub!(:update_attribute).and_return(true)
+      @story.stub!(:points).and_return(9)
     end
-    
-    it "builds a RemoteProjectRenderer for the project" do
-      RemoteProjectRenderer.should_receive(:new).with(:page => @page, :project => @project).and_return(@remote_project_renderer)
+
+    it "tells the user the story was updated" do
+      @page.should_receive(:replace_html).with(:notice, %|"FooBaz" was successfully updated.|)
+      @page.should_receive(:hide).with(:error)
+      @page.should_receive(:show).with(:notice)
+      @page.should_receive(:visual_effect).with(:appear, :notice)
+      @page.should_receive(:delay).with(5).and_yield
+      @page.should_receive(:visual_effect).with(:fade, :notice)
       xhr_update_points
     end
 
-    it "tells the renderer to render a notice telling the user the update was successful" do
-      @remote_project_renderer.should_receive(:render_notice).with(%|"#{@story.summary} was successfully updated."|)
+    it "updates the story points when there are story points" do
+      @page.should_receive(:replace_html).with("story_#{@story.id}_points", 9)
       xhr_update_points
     end
-    
-    it "tells the renderer to update the story points" do
-      @remote_project_renderer.should_receive(:update_story_points).with(@story)
+
+    it "updates the story points when there are no story points" do
+      @story.stub!(:points).and_return(nil)
+      @page.should_receive(:replace_html).with("story_#{@story.id}_points", "&infin;")
       xhr_update_points
     end
-    
-    it "tells the renderer to update the project's summary" do
-      @remote_project_renderer.should_receive(:update_project_summary)
+
+    it "updates the project summary" do
+      @page.should_receive(:replace).with(:project_summary, :partial => "projects/summary", :locals => { :project => @project })
       xhr_update_points
     end
-    
-    it "tells the renderer to draw the current iteration velocity marker" do
-      @remote_project_renderer.should_receive(:draw_current_iteration_velocity_marker)
+
+    it "redraws the workspace velocity markers" do
+      @page.should_receive(:call).with("Strac.Iteration.drawWorkspaceVelocityMarkers")
       xhr_update_points
     end
   end
 
   describe "when the update fails" do
     before do
-      @story_update.stub!(:failure).and_yield(@story)
+      @story.stub!(:update_attribute).and_return(false)
     end
 
-    it "builds a RemoteProjectRenderer for the project" do
-      RemoteProjectRenderer.should_receive(:new).with(:page => @page, :project => @project).and_return(@remote_project_renderer)
-      xhr_update_points
-    end
-    
-    it "tells the renderer to render an error telling the user the update was not successful" do
-      @remote_project_renderer.should_receive(:render_error).with(%("#{@story.summary}" was not successfully updated.))
+    it "tells the user the story failed to update" do
+      @page.should_receive(:replace_html).with(:error, %|"FooBaz" was not updated.|)
+      @page.should_receive(:hide).with(:notice)
+      @page.should_receive(:show).with(:error)
+      @page.should_receive(:visual_effect).with(:appear, :error)
+      @page.should_receive(:delay).with(5).and_yield
+      @page.should_receive(:visual_effect).with(:fade, :error)
       xhr_update_points
     end
   end

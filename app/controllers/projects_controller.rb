@@ -9,7 +9,7 @@ class ProjectsController < ApplicationController
     if @project=ProjectPermission.find_project_for_user(params[:id], current_user)
       @project
     else
-      raise AccessDenied
+      redirect_to "/access_denied.html"
     end
   end
 

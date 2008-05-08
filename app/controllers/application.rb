@@ -24,20 +24,20 @@ private
 
   def render_error(msg)
     render :update do |page|
-      page[:error].replace_html msg
-      page[:notice].hide
-      page[:error].show
+      page.replace_html :error, msg
+      page.hide :notice
+      page.show :error
       page.visual_effect :appear, :error
-      page.delay(5) { page.visual_effect :fade, :notice }
+      page.delay(5) { page.visual_effect :fade, :error }
       yield page if block_given?
     end
   end
 
   def render_notice(msg)
     render :update do |page|
-      page[:notice].replace_html msg
-      page[:error].hide
-      page[:notice].show
+      page.replace_html :notice, msg
+      page.hide :error
+      page.show :notice
       page.visual_effect :appear, :notice
       page.delay(5) { page.visual_effect :fade, :notice }
       yield page if block_given?

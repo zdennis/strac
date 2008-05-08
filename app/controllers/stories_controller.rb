@@ -87,15 +87,15 @@ class StoriesController < ApplicationController
   end
 
   def reorder
-    render :update do |page|
-      story_ids = params["iteration_nil"].delete_if{ |id| id.blank? }
-      renderer = RemoteSiteRenderer.new :page => page
-      if Story.reorder(story_ids, :bucket_id => nil )
-        renderer.render_notice "Priorities have been successfully updated."
-      else
-        renderer.render_error "There was an error while updating priorties. If the problem persists, please contact technical support."
-      end
-    end
+    story_ids = params["iteration_nil"].delete_if{ |id| id.blank? }
+    values = []
+    story_ids.each_with_index { |id,i| values << [id, i+1] }
+    columns2import = [:id, :position]
+    columns2update = [:position]
+    Story.import(columns2import, values, :on_duplicate_key_update => columns2update, :validate=>false )
+    render_notice "Priorities have been successfully updated."
+  rescue
+    render_error "There was an error while updating priorities. If the problem persists, please contact technical support."
   end
   
   def take
@@ -125,18 +125,15 @@ class StoriesController < ApplicationController
   end
   
   def update_points
-    render :update do |page|
-      if story=@project.stories.find(params[:id])
-        if story.update_attribute(:points, params[:story][:points])
-          renderer = RemoteProjectRenderer.new(:page => page, :project => @project)
-          renderer.render_notice %("#{story.summary} was successfully updated.")
-          renderer.update_story_points(story)
-          renderer.update_project_summary
-          renderer.draw_current_iteration_velocity_marker
-        else
-          renderer = RemoteProjectRenderer.new(:page => page, :project => @project)
-          renderer.render_error %("#{story.summary}" was not successfully updated.)
+    if story=@project.stories.find(params[:id])
+      if story.update_attribute(:points, params[:story][:points]) 
+        render_notice %|"#{story.summary}" was successfully updated.| do |page|
+          page.replace_html "story_#{story.id}_points", (story.points || "&infin;")
+          page.replace :project_summary, :partial => "projects/summary", :locals => { :project => @project }  
+          page.call "Strac.Iteration.drawWorkspaceVelocityMarkers"
         end
+      else
+        render_error %|"#{story.summary}" was not updated.|
       end
     end
   end

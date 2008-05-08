@@ -61,52 +61,13 @@ describe Story do
     @story.position = "string"
     assert_validates_numericality_of @story, :position
   end
-  
 end
 
-# TODO - move Story.reorder to Iteration#reorder
-describe Story, ".reorder" do
-  def reorder(story_ids, options={})
-    Story.reorder(story_ids, options)
-  end
- 
-  before do
-    Story.delete_all
-    @stories = [ Generate.story, Generate.story, Generate.story ]
-  end
-  
-  it "reorders the stories matching the passed in story ids to be in the same position" do
-    reorder([ @stories[2].id, @stories[1].id, @stories[0].id], :bucket_id => 1 )
-    @stories.reverse.each_with_index do |story, i|
-      story.reload.position.should == i+1
-    end
-  end
-
-  describe "when given a :bucket_id option" do
-    it "moves each story to the passed in :bucket_id option" do
-      reorder(@stories, :bucket_id => 2 )
-      @stories.each{ |story| story.reload.bucket_id.should == 2 }
-      reorder(@stories, :bucket_id => 3 )
-      @stories.each{ |story| story.reload.bucket_id.should == 3 }
-      reorder(@stories, :bucket_id => nil )
-      @stories.each{ |story| story.reload.bucket_id.should == nil }
-    end
-  end
-  
-  describe "when a blank entry is given inside the story_ids array" do
-    it "ignores it, and does not use it when reordering" do
-      reorder(["", @stories.first.id, "", @stories.last.id, "", @stories[1].id], :bucket_id => 99)
-      @stories.first.reload.position.should == 1
-      @stories.last.reload.position.should == 2
-      @stories[1].reload.position.should == 3
-    end
-  end
-end
 
 describe Story, "complete" do
   fixtures :statuses
   
-  it "is incomplete if it doesnot have a status" do
+  it "is incomplete if it does not have a status" do
     story = Story.new
     story.should be_incomplete
   end

@@ -1,11 +1,21 @@
 
-h1. Updating Story Points
-
 Story: As a User I want to be able to quickly update the points for a story.
   Scenario: successfully updating the points of a story
     Given there is a project with incomplete stories
-    And a user at that project's workspace
+    And a user at that project's workspace page
     When they click on the points of a story
     And they enter a different point estimate and hit enter
     Then they will see the story points changed
     And they will see a message telling them the story has been updated
+    And they will see the message fade a few seconds later
+    And they will see the total points updated in summary sidebar
+    And they will see the remaining points updated in summary sidebar
+    
+Story:  As a User I want to be able to reorder stories so I prioritize features.|, 
+  Scenario: reordering stories
+    Given there is a project with stories
+    And a user at that project's workspace page
+    When they reorder the stories
+    Then they will see a message telling them the priorities have been updated.
+    When they reload the page
+    Then they will the stories stay reordered
