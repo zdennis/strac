@@ -24,7 +24,6 @@ Rails::Initializer.run do |config|
   # Add additional load paths for your own custom dirs
   config.load_paths += %W( #{RAILS_ROOT}/app/observers 
                            #{RAILS_ROOT}/app/mailers 
-                           #{RAILS_ROOT}/app/managers
                            #{RAILS_ROOT}/app/presenters
                            #{RAILS_ROOT}/app/exceptions
                            #{RAILS_ROOT}/app/renderers )
