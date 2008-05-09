@@ -8,7 +8,7 @@ steps_for :a_user_reordering_stories do
     get login_path
     login_as @user.email_address, "password"
   end
-  Given "a logged in user access to the project" do
+  Given "a logged in user accesses the project" do
     @user = Generate.user
     @user.projects << @project
     get login_path

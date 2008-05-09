@@ -16,7 +16,7 @@ Story "Reordering Project Stories", %|
 
   Scenario "a user with access reordering its stories" do
     Given "there is a project with stories"
-    And "a logged in user access to the project"
+    And "a logged in user accesses the project"
     When "the user reorders the stories"
     Then "the positions of the stories are updated"
   end
