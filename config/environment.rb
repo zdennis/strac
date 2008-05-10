@@ -88,3 +88,4 @@ end
 
 require 'metaid'
 require 'constructor'
+require 'gchart'
