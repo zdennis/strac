@@ -282,12 +282,20 @@ class Gchart
   # to about 300 pixels. Simple encoding is suitable for all other types of chart regardless of size.
   def simple_encoding(dataset=[])
     dataset = prepare_dataset(dataset)
-    @max_value = dataset.map{|ds| ds.max}.max if @max_value == 'auto'
+    @max_value = dataset.map{|ds| ds.map(&:to_i).max}.max if @max_value == 'auto'
     
     if @max_value == false || @max_value == 'false' || @max_value == :false
       "s:" + dataset.map { |ds| ds.map { |number| convert_to_simple_value(number) }.join }.join(',')
     else
-      "s:" + dataset.map { |ds| ds.map { |number| convert_to_simple_value( (@@simple_chars.size - 1) * number / @max_value) }.join }.join(',')
+      "s:" + dataset.map do |ds| 
+        ds.map do |number| 
+          if number.nil?
+            "_"
+          else
+            convert_to_simple_value( (@@simple_chars.size - 1) * number / @max_value) 
+          end
+        end.join 
+      end.join(',')
     end
     
   end
