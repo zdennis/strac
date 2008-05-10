@@ -110,10 +110,14 @@ Strac.Iteration.prototype = {
   },
   
   stories: function(){
-    return this.story_list_element.select(".story_card").map(function(el){
-      return new Strac.Story(el);
-      Object.extend(el, Strac.Story);
-    });
+    if(this.story_list_element){
+      return this.story_list_element.select(".story_card").map(function(el){
+        return new Strac.Story(el);
+        Object.extend(el, Strac.Story);
+      });
+    }else{
+      return [];
+    };
   }
 };
 
