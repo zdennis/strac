@@ -7,7 +7,7 @@ class ProjectsController < ApplicationController
     points_completed = []
     points_remaining = []
     
-    iterations = @project.iterations.sort_by{ |iteration| iteration.start_date }
+    iterations = @project.iterations.sort_by{ |iteration| iteration.started_at }
     iterations.each do |iteration|
       points_completed << iteration.snapshot.completed_points
       points_remaining << iteration.snapshot.remaining_points
