@@ -8,7 +8,7 @@ ActionController::Routing::Routes.draw do |map|
     users_map.signup "users/signup", :action => "signup"
   end
 
-  map.resources :tags, :collection => { :auto_complete => :any }
+  map.resources :tags, :collection => { :auto_complete => :get }
   map.resources :projects, :member => { :workspace => :get, :chart => :get } do |project_map|
     project_map.resources :phases
     project_map.resources :invitations

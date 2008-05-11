@@ -32,7 +32,7 @@ class Project < ActiveRecord::Base
     
       case params && params[:iteration]
         when "recent"
-          conditions << "stories.bucket_id IN(?)"
+          conditions << "(stories.bucket_id IN(?) OR stories.bucket_id IS NULL)"
           values << [proxy_owner.iterations.previous, proxy_owner.iterations.current, proxy_owner.iterations.backlog]
         else
           joins << "LEFT JOIN buckets ON buckets.id = stories.bucket_id"

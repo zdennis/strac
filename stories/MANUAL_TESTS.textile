@@ -19,3 +19,12 @@ Story:  As a User I want to be able to reorder stories so I prioritize features.
     Then they will see a message telling them the priorities have been updated.
     When they reload the page
     Then they will the stories stay reordered
+    
+Scenario: As a User I want to be able to see auto-completed tags as I type when creating a story.
+  Scenario: picking an existing tag
+    Given there is a project
+    And a user at that project's workspace page
+    When they create a story with the tag "foo"
+    And they start creating another story
+    And they start typing "f" in the tag field
+    Then they will see a dropdown list showing them autocomplete matches to choose from

@@ -1,57 +1,38 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
 describe User do
-  before(:each) do
-    @user = User.new
+  before do
+    @user = Generate.user :email_address => "joe@example.com"
   end
   
-  it "requires a unique email address"
+  describe "validations" do
+    it_validates_uniqueness_of :email_address, :value => "joe@example.com"
 
-  it "should be valid" do
-    @user.group_id = 1
-    @user.email_address = "me@me.com"
-    @user.should be_valid
+    it "should be valid" do
+      @user.group_id = 1
+      @user.email_address = "me@me.com"
+      @user.should be_valid
+    end
+  
+    it "requires a group id" do
+      @user.group_id = nil
+      @user.should validate_presence_of(:group_id)
+    end
+
+    it "requires an email address" do
+      @user.email_address = nil
+      @user.should validate_presence_of(:email_address)
+    end
   end
   
-  it "should always have a group id" do
-    assert_validates_presence_of @user, :group_id
+  describe "associations" do
+    it_belongs_to :group
+    it_has_many :stories, :as => :responsible_party
+    it_has_many :projects, :through => :project_permissions, :source=>:project,
+                :conditions => nil, :extend=>[], :class_name=>"Project", :limit=>nil,
+                :order=>nil, :group=>nil, :offset=>nil, :foreign_key=>"project_id"
+    it_has_many :project_permissions, :as => :accessor, :extend=>[], :dependent=>:destroy, 
+                :order=>nil, :class_name=>"ProjectPermission", :conditions=>nil
   end
-  
-  it "should always have an email address" do
-    assert_validates_presence_of @user, :email_address
-  end
-  
-  it "should belong a Group" do
-    assert_association User, :belongs_to, :group, Group
-  end
-  
-  it "should have many Stories" do
-    assert_association User, :has_many, :stories, Story, :as => :responsible_party
-  end
-    
-  it "should have many Projects" do
-    assert_association User, :has_many, :projects, Project, 
-       :source=>:project,
-       :conditions => nil,
-       :extend=>[],
-       :class_name=>"Project",
-       :limit=>nil,
-       :order=>nil,
-       :through=>:project_permissions,
-       :group=>nil,
-       :offset=>nil,
-       :foreign_key=>"project_id"
-  end
-  
-  it "should have many Project Permissions" do
-    assert_association User, :has_many, :project_permissions, ProjectPermission, 
-       :extend=>[],
-       :dependent=>:destroy,
-       :order=>nil,
-       :class_name=>"ProjectPermission",
-       :as=>:accessor,
-       :conditions=>nil
-  end
-  
 
 end

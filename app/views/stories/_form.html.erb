@@ -32,7 +32,7 @@
           <td>
 						<%= form.text_field :tag_list, :size => 41, :id => "story_#{story.id || "nil"}_tag_list" %>
 						<div id="story_<%= story.id || "nil" %>_tag_list_auto_complete" class="auto_complete_results"></div>
-						<%= auto_complete_field "story_#{story.id || "nil"}_tag_list", :url => auto_complete_tags_path, :tokens => ",", :param_name => 'tag' %>
+						<%= auto_complete_field "story_#{story.id || "nil"}_tag_list", :url => auto_complete_tags_path, :tokens => ",", :param_name => 'tag', :method => "get" %>
           </td>
         </tr>
       </table>
