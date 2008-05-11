@@ -19,8 +19,8 @@ class ProjectsController < ApplicationController
     total_points << @project.total_points
     
     iteration_count = iterations.size
-    xvalues = (0..iteration_count).to_a
-    _slope = slope(xvalues, points_remaining)
+    xvalues = (1..iteration_count).to_a
+    _slope = slope(xvalues, points_remaining.values_at(*xvalues))
     _intercept = intercept(_slope, xvalues, points_remaining)
     trends = xvalues.inject([]) {|values, i| values << _intercept + i*_slope }
      
