@@ -2,7 +2,7 @@ class InvitationsController < ApplicationController
   before_filter :find_project
 
   def create
-    email_addresses = params[:email_addresses].split(/\s*,\s*/)
+    email_addresses = params[:email_addresses].split(/\s*[,\n]\s*/)
     invitations = email_addresses.map do |recipient|
       Invitation.create!(:project => @project, :inviter => current_user, :recipient => recipient, 
                          :code => UniqueCodeGenerator.generate(recipient),

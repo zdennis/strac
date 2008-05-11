@@ -3,13 +3,10 @@ require File.dirname(__FILE__) + '/../spec_helper'
 describe InvitationsController, "#new" do
   before do
     @project = Generate.project :name => "Project A"
-    
-    @user = Generate.user :email_address => "user@exmaple.com"
+    @user = Generate.user :email_address => "user@example.com"
     @user.projects << @project
-    
     @invitation = stub("Invitation")
     Invitation.stub!(:new)
-    
     login_as @user
   end
 
@@ -22,7 +19,7 @@ describe InvitationsController, "#new" do
     response.should be_success
   end
   
-  it "renders the new tmplate" do
+  it "renders the new template" do
     get_new
     response.should render_template('new')
   end
@@ -34,9 +31,7 @@ describe InvitationsController, "#new" do
 
   it "assigns a new invitation" do
     Invitation.should_receive(:new).and_return(@invitation)
-    
     get_new
-    
     assigns[:invitation].should == @invitation
   end
 end

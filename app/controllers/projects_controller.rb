@@ -55,11 +55,8 @@ class ProjectsController < ApplicationController
   end
 
   def show
-    if @project=ProjectPermission.find_project_for_user(params[:id], current_user)
-      @project
-    else
-      redirect_to "/access_denied.html"
-    end
+    @project = ProjectPermission.find_project_for_user(params[:id], current_user)
+    redirect_to "/access_denied.html" unless @project
   end
 
   def new
@@ -67,11 +64,8 @@ class ProjectsController < ApplicationController
   end
 
   def edit
-    if @project=ProjectPermission.find_project_for_user(params[:id], current_user)
-      @project
-    else
-      redirect_to "/access_denied.html"
-    end
+    @project = ProjectPermission.find_project_for_user(params[:id], current_user)
+    redirect_to "/access_denied.html" unless @project
   end
 
   def create
