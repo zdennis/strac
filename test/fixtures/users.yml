@@ -1,5 +1,5 @@
 # == Schema Information
-# Schema version: 41
+# Schema version: 50
 #
 # Table name: users
 #
@@ -9,7 +9,6 @@
 #  last_name                    :string(255)   
 #  email_address                :string(255)   
 #  group_id                     :integer(11)   
-#  company_id                   :integer(11)   
 #  created_at                   :datetime      
 #  updated_at                   :datetime      
 #  active                       :boolean(1)    

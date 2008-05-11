@@ -1,3 +1,12 @@
+# == Schema Information
+# Schema version: 50
+#
+# Table name: tags
+#
+#  id   :integer(11)   not null, primary key
+#  name :string(255)   
+#
+
 class Tag < ActiveRecord::Base
   
   # This is to be used over a has_many_polymorphs in the context of the class

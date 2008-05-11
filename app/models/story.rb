@@ -1,5 +1,5 @@
 # == Schema Information
-# Schema version: 41
+# Schema version: 50
 #
 # Table name: stories
 #
@@ -8,7 +8,7 @@
 #  description            :text          
 #  points                 :integer(11)   
 #  position               :integer(11)   
-#  bucket_id           :integer(11)   
+#  bucket_id              :integer(11)   
 #  project_id             :integer(11)   
 #  responsible_party_id   :integer(11)   
 #  responsible_party_type :string(255)   

@@ -44,7 +44,7 @@ class ProjectsController < ApplicationController
      :size => "600x200",
      :axis_with_labels => ["x", "y"],
      :axis_labels => [xlabels, ylabels],
-     :legend => ["Total Points", "Points Remaining", "Total Points Completed", "Points Remaining Trend"]
+     :legend => ["Total Points", "Total Points Completed", "Points Remaining", "Points Remaining Trend"]
     )
     
     render :text => chart.send!(:fetch)
