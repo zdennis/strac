@@ -1,5 +1,4 @@
-# extend the existing Tag class
-Tag.class_eval do
+class Tag < ActiveRecord::Base
   
   # This is to be used over a has_many_polymorphs in the context of the class
   # during parse time since has_many_polymorphs forces all of the models involved to load. 
@@ -10,3 +9,4 @@ Tag.class_eval do
     stories
   end
 end
+
