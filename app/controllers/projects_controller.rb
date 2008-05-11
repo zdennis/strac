@@ -131,7 +131,7 @@ class ProjectsController < ApplicationController
   end
   
   def sum_products(xs, ys)
-    xs.zip(ys).inject{|result, (x,y)|
+    xs.zip(ys).inject(0.0){|result, (x,y)|
       result + x*y
     }
   end
