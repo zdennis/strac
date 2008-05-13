@@ -9,22 +9,13 @@ class ProjectsController < ApplicationController
         
     iterations = @project.iterations.sort_by{ |iteration| iteration.started_at }
      
-    
-    xlabels = iterations.map{ |e| iterations.index(e) } + ["current"]
-
-    red = 'FF0000'
-    dark_purple = '551a8b'
-    green = '00FF00'
-    blue = '0000FF'
-    purple = 'a020f0'
-    
     data =   [@project_chart_presenter.total_points, @project_chart_presenter.completed_points, @project_chart_presenter.remaining_points]
-    colors = [blue,         green,            purple]
+    colors = [@project_chart_presenter.blue,         @project_chart_presenter.green,            @project_chart_presenter.purple]
     legend = ["Total Points", "Total Points Completed", "Points Remaining"]
     
     if @project_chart_presenter.show_trends?
       data << @project_chart_presenter.trends
-      colors << dark_purple
+      colors << @project_chart_presenter.dark_purple
       legend << "Points Remaining Trend"
     end
     
@@ -33,7 +24,7 @@ class ProjectsController < ApplicationController
      :bar_colors => colors,
      :size => "600x200",
      :axis_with_labels => ["x", "y"],
-     :axis_labels => [xlabels, @project_chart_presenter.ylabels],
+     :axis_labels => [@project_chart_presenter.xlabels, @project_chart_presenter.ylabels],
      :legend => legend
     )
     
