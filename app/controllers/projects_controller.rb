@@ -8,15 +8,6 @@ class ProjectsController < ApplicationController
     trends = []
         
     iterations = @project.iterations.sort_by{ |iteration| iteration.started_at }
-    
-    iteration_count = iterations.size
-    show_trends = iteration_count > 1
-    if show_trends
-      xvalues = (1..iteration_count).to_a
-      _slope = slope(xvalues, @project_chart_presenter.remaining_points.values_at(*xvalues))
-      _intercept = intercept(_slope, xvalues, @project_chart_presenter.remaining_points)
-      trends = xvalues.inject([]) {|values, i| values << _intercept + i*_slope }
-    end
      
     step_count = 6
     min = 0
@@ -36,8 +27,8 @@ class ProjectsController < ApplicationController
     colors = [blue,         green,            purple]
     legend = ["Total Points", "Total Points Completed", "Points Remaining"]
     
-    if show_trends
-      data << trends
+    if @project_chart_presenter.show_trends?
+      data << @project_chart_presenter.trends
       colors << dark_purple
       legend << "Points Remaining Trend"
     end
@@ -114,31 +105,4 @@ class ProjectsController < ApplicationController
   end
   
   private
-  
-  def sum(arr)
-    arr.inject(0.0){ |sum, x|
-      sum + x
-    }
-  end
-  
-  def sum_products(xs, ys)
-    xs.zip(ys).inject(0.0){|result, (x,y)|
-      result + x*y
-    }
-  end
-  
-  def sum_squares(xs)
-    xs.inject(0.0) {|result, x|
-      result + x*x
-    }
-  end
-  
-  def slope(xs, ys)
-    n = xs.size
-    (n*sum_products(xs, ys) - sum(xs)*sum(ys)) / (n*sum_squares(xs) - sum(xs)**2)
-  end
-  
-  def intercept(m, xs,ys)
-    (sum(ys) - m*sum(xs))/xs.size
-  end
 end
