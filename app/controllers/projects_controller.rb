@@ -9,13 +9,22 @@ class ProjectsController < ApplicationController
         
     iterations = @project.iterations.sort_by{ |iteration| iteration.started_at }
      
-    data =   [@project_chart_presenter.total_points, @project_chart_presenter.completed_points, @project_chart_presenter.remaining_points]
-    colors = [@project_chart_presenter.blue,         @project_chart_presenter.green,            @project_chart_presenter.purple]
+    data =   [
+      @project_chart_presenter.total_points, 
+      @project_chart_presenter.completed_points, 
+      @project_chart_presenter.remaining_points
+    ]
+    colors = [
+      @project_chart_presenter.total_points_color,         
+      @project_chart_presenter.completed_points_color,            
+      @project_chart_presenter.remaining_points_color
+    ]
+    
     legend = ["Total Points", "Total Points Completed", "Points Remaining"]
     
     if @project_chart_presenter.show_trends?
       data << @project_chart_presenter.trends
-      colors << @project_chart_presenter.dark_purple
+      colors << @project_chart_presenter.dark_remaining_points_color
       legend << "Points Remaining Trend"
     end
     
