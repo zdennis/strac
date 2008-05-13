@@ -369,7 +369,7 @@ describe ProjectsController, '#chart' do
     before do
       @project = Generate.project :members => [@user]
 
-      @iteration1_story1 = Generate.story :points => 75, :project => @project
+      @incomplete_story = Generate.story :points => 75, :project => @project
       
       @iteration1_snapshot = Generate.snapshot(
         :total_points => 100,
@@ -404,6 +404,43 @@ describe ProjectsController, '#chart' do
         :axis_labels=>[[0, 1, "current"], [0, 17, 33, 50, 67, 83, 100]], 
         :size=>"600x200", 
         :bar_colors=>["0000FF", "00FF00", "a020f0", "551a8b"]
+      }).and_return(@gchart)
+      @gchart.should_receive(:send!).with(:fetch).and_return("the chart")
+      
+      get :chart, :id => @project.id
+      
+      @response.body.should == "the chart"
+    end
+  end
+  
+  
+  describe 'when the user has access to a project with no completed iterations and a brand new current iteration' do
+    before do
+      @project = Generate.project :members => [@user]
+
+      @incomplete_story = Generate.story :points => 100, :project => @project
+      
+      @iteration1_snapshot = Generate.snapshot(
+        :total_points => 100,
+        :completed_points => 0,
+        :remaining_points => 100
+      )
+      @iteration1 = Generate.current_iteration :project => @project,
+        :started_at => 2.weeks.ago,
+        :snapshot => @iteration1_snapshot
+      
+      ProjectPermission.stub!(:find_project_for_user).and_return(@project)
+    end
+    
+    it "should create a Gchart with the project history" do
+      @gchart = mock("Gchart")
+      Gchart.should_receive(:new).with({
+        :legend=>["Total Points", "Total Points Completed", "Points Remaining"], 
+        :data=>[[100, 100], [0, 0], [100, 100]], 
+        :axis_with_labels=>["x", "y"], 
+        :axis_labels=>[[0, "current"], [0, 17, 33, 50, 67, 83, 100]], 
+        :size=>"600x200", 
+        :bar_colors=>["0000FF", "00FF00", "a020f0"]
       }).and_return(@gchart)
       @gchart.should_receive(:send!).with(:fetch).and_return("the chart")
       
