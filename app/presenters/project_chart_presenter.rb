@@ -32,9 +32,10 @@ class ProjectChartPresenter < PresentationObject
   declare :trends do
     iteration_count = iterations.size
     xvalues = (1..iteration_count).to_a
-    _slope = slope(xvalues, remaining_points.values_at(*xvalues))
-    _intercept = intercept(_slope, xvalues, remaining_points)
-    xvalues.inject([]) {|values, i| values << _intercept + i*_slope }
+    yvalues = remaining_points.values_at(*xvalues)
+    _slope = slope(xvalues, yvalues)
+    _intercept = intercept(_slope, xvalues, yvalues)
+    (0..iteration_count).inject([]) {|values, i| values << _intercept + i*_slope }
   end
   
   declare :ylabels do

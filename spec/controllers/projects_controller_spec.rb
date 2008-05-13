@@ -399,7 +399,7 @@ describe ProjectsController, '#chart' do
       @gchart = mock("Gchart")
       Gchart.should_receive(:new).with({
         :legend=>["Total Points", "Total Points Completed", "Points Remaining", "Points Remaining Trend"], 
-        :data=>[[100, 100, 100], [0, 15, 25], [100, 85, 75], [135.0, 125.0]], 
+        :data=>[[100, 100, 100], [0, 15, 25], [100, 85, 75], [95.0, 85.0, 75.0]], 
         :axis_with_labels=>["x", "y"], 
         :axis_labels=>[[0, 1, "current"], [0, 17, 33, 50, 67, 83, 100]], 
         :size=>"600x200", 
