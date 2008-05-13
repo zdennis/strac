@@ -34,7 +34,7 @@ class ProjectChartPresenter < PresentationObject
     xvalues = (1..iteration_count).to_a
 
     regression = LinearRegression.new xvalues, remaining_points.values_at(*xvalues)
-    (0..iteration_count).inject([]) {|values, i| values << regression.intercept + i*regression.slope }
+    (0..iteration_count).inject([]) {|values, i| values << regression[i] }
   end
   
   declare :ylabels do

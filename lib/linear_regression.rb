@@ -7,6 +7,10 @@ class LinearRegression
   
   attr_reader :slope, :intercept
   
+  def [](x)
+    @intercept + @slope*x
+  end
+  
   private
   
   def sum(arr)
