@@ -51,6 +51,27 @@ class ProjectChartPresenter < PresentationObject
     ylabels
   end
   
+  declare :xlabels do
+    iterations.map{ |e| iterations.index(e) } + ["current"]
+  end
+  
+  declare :dark_purple do
+    '551a8b'
+  end
+  
+  declare :green do
+    '00FF00'
+  end
+  
+  declare :blue do
+    '0000FF'
+  end
+  
+  declare :purple do
+    'a020f0'
+  end
+  
+  
   private
   
   def sum(arr)
