@@ -9,12 +9,7 @@ class ProjectsController < ApplicationController
         
     iterations = @project.iterations.sort_by{ |iteration| iteration.started_at }
      
-    step_count = 6
-    min = 0
-    max = (@project_chart_presenter.completed_points + @project_chart_presenter.total_points + @project_chart_presenter.remaining_points).map(&:to_i).max
-    step = [max / step_count.to_f, 1].max
-    ylabels = []
-    min.step(max, step) { |f| ylabels << f.round }
+    
     xlabels = iterations.map{ |e| iterations.index(e) } + ["current"]
 
     red = 'FF0000'
@@ -38,7 +33,7 @@ class ProjectsController < ApplicationController
      :bar_colors => colors,
      :size => "600x200",
      :axis_with_labels => ["x", "y"],
-     :axis_labels => [xlabels, ylabels],
+     :axis_labels => [xlabels, @project_chart_presenter.ylabels],
      :legend => legend
     )
     

@@ -37,6 +37,16 @@ class ProjectChartPresenter < PresentationObject
     xvalues.inject([]) {|values, i| values << _intercept + i*_slope }
   end
   
+  declare :ylabels do
+    step_count = 6
+    min = 0
+    max = (completed_points + total_points + remaining_points).map(&:to_i).max
+    step = [max / step_count.to_f, 1].max
+    ylabels = []
+    min.step(max, step) { |f| ylabels << f.round }
+    ylabels
+  end
+  
   private
   
   def sum(arr)
