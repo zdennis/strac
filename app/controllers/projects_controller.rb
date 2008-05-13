@@ -98,6 +98,4 @@ class ProjectsController < ApplicationController
       redirect_to "/access_denied.html"
     end
   end
-  
-  private
 end
