@@ -19,15 +19,18 @@ class ProjectsController < ApplicationController
     total_points << @project.total_points
     
     iteration_count = iterations.size
-    xvalues = (1..iteration_count).to_a
-    _slope = slope(xvalues, points_remaining.values_at(*xvalues))
-    _intercept = intercept(_slope, xvalues, points_remaining)
-    trends = xvalues.inject([]) {|values, i| values << _intercept + i*_slope }
+    show_trends = iteration_count > 1
+    if show_trends
+      xvalues = (1..iteration_count).to_a
+      _slope = slope(xvalues, points_remaining.values_at(*xvalues))
+      _intercept = intercept(_slope, xvalues, points_remaining)
+      trends = xvalues.inject([]) {|values, i| values << _intercept + i*_slope }
+    end
      
     step_count = 6
     min = 0
     max = (points_completed + total_points + points_remaining).map(&:to_i).max
-    step = max / step_count.to_f
+    step = [max / step_count.to_f, 1].max
     ylabels = []
     min.step(max, step) { |f| ylabels << f.round }
     xlabels = iterations.map{ |e| iterations.index(e) } + ["current"]
@@ -38,13 +41,23 @@ class ProjectsController < ApplicationController
     blue = '0000FF'
     purple = 'a020f0'
     
+    data =   [total_points, points_completed, points_remaining]
+    colors = [blue,         green,            purple]
+    legend = ["Total Points", "Total Points Completed", "Points Remaining"]
+    
+    if show_trends
+      data << trends
+      colors << dark_purple
+      legend << "Points Remaining Trend"
+    end
+    
     chart = Gchart.new(
-     :data =>       [total_points, points_completed, points_remaining, trends], 
-     :bar_colors => [blue,         green,            purple, dark_purple],
+     :data =>       data, 
+     :bar_colors => colors,
      :size => "600x200",
      :axis_with_labels => ["x", "y"],
      :axis_labels => [xlabels, ylabels],
-     :legend => ["Total Points", "Total Points Completed", "Points Remaining", "Points Remaining Trend"]
+     :legend => legend
     )
     
     render :text => chart.send!(:fetch)
