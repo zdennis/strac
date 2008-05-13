@@ -3,18 +3,17 @@ class ProjectsController < ApplicationController
   
   def chart
     @project=ProjectPermission.find_project_for_user(params[:id], current_user)
+    @project_chart_presenter = ProjectChartPresenter.new @project
+    
     total_points = []
-    points_completed = []
     points_remaining = []
     trends = []
-    
+        
     iterations = @project.iterations.sort_by{ |iteration| iteration.started_at }
     iterations.each do |iteration|
-      points_completed << iteration.snapshot.completed_points
       points_remaining << iteration.snapshot.remaining_points
       total_points << iteration.snapshot.total_points
     end
-    points_completed << @project.completed_points
     points_remaining << @project.remaining_points
     total_points << @project.total_points
     
@@ -30,7 +29,7 @@ class ProjectsController < ApplicationController
      
     step_count = 6
     min = 0
-    max = (points_completed + total_points + points_remaining).map(&:to_i).max
+    max = (@project_chart_presenter.points_completed + total_points + points_remaining).map(&:to_i).max
     step = [max / step_count.to_f, 1].max
     ylabels = []
     min.step(max, step) { |f| ylabels << f.round }
@@ -42,7 +41,7 @@ class ProjectsController < ApplicationController
     blue = '0000FF'
     purple = 'a020f0'
     
-    data =   [total_points, points_completed, points_remaining]
+    data =   [total_points, @project_chart_presenter.points_completed, points_remaining]
     colors = [blue,         green,            purple]
     legend = ["Total Points", "Total Points Completed", "Points Remaining"]
     
