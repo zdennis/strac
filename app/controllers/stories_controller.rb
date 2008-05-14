@@ -19,12 +19,12 @@ class StoriesController < ApplicationController
   end
 
   def new
-    @story = @project.stories.build
+    @story = StoryPresenter.new :story => @project.stories.build
     respond_to :js
   end
   
   def edit
-    @story = @project.stories.find(params[:id], :include => :tags)
+    @story = StoryPresenter.new :story => @project.stories.find(params[:id], :include => :tags)
     respond_to do |format|
       format.html
       format.js { render :action => 'edit' }

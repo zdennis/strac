@@ -8,8 +8,8 @@ describe StoryPresenter do
   
   describe 'delegations' do
     it_delegates :class, :id, :new_record?, :to_param,
-                 :bucket_id, :description, :points, :priority_id, 
-                 :responsible_party_type_id, :status_id, :summary, :tag_list,
+                 :bucket_id, :comments, :description, :errors, :points, :priority_id, 
+                 :project, :responsible_party_type_id, :status_id, :summary, :tag_list,
                  :on => :presenter, :to => :story
   end
   
