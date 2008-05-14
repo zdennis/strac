@@ -23,5 +23,4 @@ class StoryPresenter < PresentationObject
   declare :possible_priorities do
     Priority.find(:all).map{ |priority| [priority.name, priority.id] }.unshift []
   end
-    
 end
