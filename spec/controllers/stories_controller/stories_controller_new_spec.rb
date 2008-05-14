@@ -10,8 +10,9 @@ describe StoriesController, '#new' do
     @stories = mock("stories collection", :build => nil)
     @project = mock_model(Project, :stories => @stories)
     ProjectPermission.stub!(:find_project_for_user).and_return(@project)
+    StoryPresenter.stub!(:new)
     Status.stub!(:find).with(:all).and_return([])
-    Priority.stub!(:find).with(:all).and_return([])
+    Priority.stub!(:find).with(:all).and_return([])    
   end
 
   it "finds and assigns the @project for the requested story" do
@@ -33,7 +34,7 @@ describe StoriesController, '#new' do
     xhr_get_new
     assigns[:priorities].should == [ [], ["Baz", priorities.first.id], ["Bar", priorities.last.id] ]
   end
-  
+
   describe "when a project can't be found" do
     before do
       ProjectPermission.stub!(:find_project_for_user).and_return(nil)
@@ -52,11 +53,12 @@ describe StoriesController, '#new' do
     end
   end
 
-  it "assigns @story to a new story for the project" do
+  it "makes a StoryPresenter with a new Story available to the view" do
     @project.should_receive(:stories).and_return(@stories)
-    @stories.should_receive(:build).with().and_return(:newly_built_story)
+    @stories.should_receive(:build).with().and_return("newly_built_story")
+    StoryPresenter.should_receive(:new).with(:story => "newly_built_story").and_return("story presenter")
     xhr_get_new
-    assigns[:story].should == :newly_built_story
+    assigns[:story].should == "story presenter"
   end
 
   it "renders the stories/new template" do

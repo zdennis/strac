@@ -12,14 +12,9 @@ describe StoriesController, '#edit' do
     @stories = stub("stories", :find => nil)
     ProjectPermission.stub!(:find_project_for_user).and_return(@project)
     @project.stub!(:stories).and_return(@stories)
+    StoryPresenter.stub!(:new)
     Status.stub!(:find).with(:all).and_return([])
-    Priority.stub!(:find).with(:all).and_return([])
-  end
-
-  it "finds and assigns the @project for the requested story" do
-    ProjectPermission.should_receive(:find_project_for_user).with(@project.id.to_s, @user).and_return(@project)
-    get_edit
-    assigns[:project].should == @project
+    Priority.stub!(:find).with(:all).and_return([])    
   end
 
   it "finds and assigns statuses" do
@@ -53,11 +48,11 @@ describe StoriesController, '#edit' do
     get_edit
   end
   
-  it "assigns @story" do
-    story = stub("story")
-    @stories.stub!(:find).and_return(story)
+  it "makes a StoryPresenter with a the requested Story available to the view" do
+    @stories.stub!(:find).and_return(@story)
+    StoryPresenter.should_receive(:new).with(:story => @story).and_return("story presenter")
     get_edit
-    assigns[:story].should == story
+    assigns[:story].should == "story presenter"
   end
   
   describe StoriesController, 'html request' do
