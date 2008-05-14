@@ -46,7 +46,7 @@ class Project < ActiveRecord::Base
   has_many :activities
   has_many :project_permissions, :dependent => :destroy
   has_many_polymorphs :accessors, :through => :project_permissions, :from => [:users]
-  has_many :buckets
+  has_many :buckets, :order => :started_at
   has_many :phases 
   has_many :iterations do 
     def previous
