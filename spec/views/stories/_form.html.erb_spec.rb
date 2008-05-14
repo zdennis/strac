@@ -10,21 +10,22 @@ describe "/stories/_form.html.erb" do
   before do
     @user = mock_model(User, :full_name => "Zach Dennis")
     template.stub!(:current_user).and_return(@user)
+    @buckets = stub("buckets", :find => [])
+    @users = stub("users", :find => [])
+    @project = mock_model(Project, :buckets => @buckets, :users => @users)
     @story = mock_model(Story, 
       :bucket_id => 90,
       :description => nil,
       :points => 100,
       :possible_statuses => [],
       :possible_priorities => [],
+      :project => @project,
       :priority_id => 105,
       :responsible_party_type_id => 110,
       :status_id => 120,
       :summary => nil, 
       :tag_list => nil
     )
-    @buckets = stub("buckets", :find => [])
-    @users = stub("users", :find => [])
-    @project = mock_model(Project, :buckets => @buckets, :users => @users)
   end
 
   it "has a summary text field" do
