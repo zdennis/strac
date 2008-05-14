@@ -12,7 +12,27 @@ describe StoryPresenter do
                  :project, :responsible_party_type_id, :status_id, :summary, :tag_list,
                  :on => :presenter, :to => :story
   end
-  
+
+  describe '#possible_buckets' do
+    before do
+      @buckets = [
+        mock_model(Bucket, :type => "Foo"),
+        mock_model(Bucket, :type => "Bar"), 
+        mock_model(Bucket, :type => "Bar")]
+      @project = mock_model(Project)
+      @story.stub!(:project).and_return(@project)
+    end
+    
+    it "returns the possible buckets for the story" do
+      @project.should_receive(:buckets).and_return(@buckets)
+      results = @presenter.possible_buckets
+      results.should == [ 
+        OpenStruct.new(:name => "Foo", :group => [@buckets[0]]),
+        OpenStruct.new(:name => "Bar", :group => [@buckets[1], @buckets[2]])
+      ]
+    end
+  end
+
   describe '#possible_statuses' do
     it "returns the possible statuses for the story" do
       statuses = [ mock_model(Status, :name => "Foo"), mock_model(Status, :name => "Baz") ]

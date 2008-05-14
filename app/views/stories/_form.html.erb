@@ -55,18 +55,10 @@
             <b>Iteration/Phases</b>
           </td>
           <td>
-            
-            <%= 
-                bucket_hash = story.project.buckets.find(:all, :order => :started_at).group_by(&:type)
-                buckets = bucket_hash.keys.inject([]) do |arr,key| 
-                  values = bucket_hash[key]
-                  def values.name ; first.type; end
-                  def values.group ; self ; end
-                  arr << values
-                end
-                select_tag "story[bucket_id]", 
-                  "<option></option>" + option_groups_from_collection_for_select(buckets, :group, :name, :id, :name, story.bucket_id)
-                  %>
+            <%=
+              options = option_groups_from_collection_for_select(story.possible_buckets, :group, :name, :id, :name, story.bucket_id)
+              select_tag 'story[bucket_id]', '<option value=""></option>' + options
+            %>
           </td>
         </tr>
         <tr>

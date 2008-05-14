@@ -10,13 +10,13 @@ describe "/stories/_form.html.erb" do
   before do
     @user = mock_model(User, :full_name => "Zach Dennis")
     template.stub!(:current_user).and_return(@user)
-    @buckets = stub("buckets", :find => [])
     @users = stub("users", :find => [])
-    @project = mock_model(Project, :buckets => @buckets, :users => @users)
+    @project = mock_model(Project, :users => @users)
     @story = mock_model(Story, 
       :bucket_id => 90,
       :description => nil,
       :points => 100,
+      :possible_buckets => [],
       :possible_statuses => [],
       :possible_priorities => [],
       :project => @project,
@@ -102,23 +102,16 @@ describe "/stories/_form.html.erb" do
   end
   
   it "has a bucket dropdown select" do
-    my_buckets = [
-      mock_model(Bucket, :name => "Iteration 1", :type => "Iteration"), 
-      mock_model(Bucket, :name => "Phase 1", :type => "Phase")
-    ]
-    @project.should_receive(:buckets).and_return(@buckets)
-    @buckets.should_receive(:find).with(:all, :order => :started_at).and_return(my_buckets)
-    @story.stub!(:bucket_id).and_return(my_buckets.last.id)
+    @story.stub!(:possible_buckets).and_return("possible buckets")
+    @story.stub!(:bucket_id).and_return(99)
+    template.should_receive(:option_groups_from_collection_for_select).with(
+      "possible buckets", :group, :name, :id, :name, 99
+    ).and_return(%|<p id="generated-option-groups" />|)
     render_it
     response.should have_tag('select[name=?]', 'story[bucket_id]') do
-      with_tag('optgroup[label=?]',"Iteration") do
-        with_tag('option[value=?]', my_buckets.first.id, "Iteration 1")
-      end
-      with_tag('optgroup[label=?]',"Phase") do
-        with_tag('option[value=?][selected=selected]', my_buckets.last.id, "Phase 1")
-      end
+      with_tag("option[value='']", "")
+      with_tag('p#generated-option-groups')
     end
-    
   end
     
   it "has an auto complete field for the tag list" do
