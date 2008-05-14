@@ -57,7 +57,7 @@
           <td>
             
             <%= 
-                bucket_hash = @project.buckets.find(:all, :order => :started_at).group_by(&:type)
+                bucket_hash = story.project.buckets.find(:all, :order => :started_at).group_by(&:type)
                 buckets = bucket_hash.keys.inject([]) do |arr,key| 
                   values = bucket_hash[key]
                   def values.name ; first.type; end
@@ -74,7 +74,7 @@
             <b>Responsible Party</b>
           </td>
           <td>
-            <%= select_tag "story[responsible_party_type_id]", options_for_responsible_parties(@project, story.responsible_party_type_id) %>
+            <%= select_tag "story[responsible_party_type_id]", options_for_responsible_parties(story.project, story.responsible_party_type_id) %>
           </td>
         </tr>
         <tr>
