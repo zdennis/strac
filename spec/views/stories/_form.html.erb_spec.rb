@@ -3,7 +3,6 @@ require File.dirname(__FILE__) + '/../../spec_helper'
 describe "/stories/_form.html.erb" do
   def render_it
     assigns[:project] = @project
-    assigns[:statuses] = @statuses
     assigns[:priorities] = @priorities
     form = ActionView::Helpers::FormBuilder.new "story", @story, template, Hash.new, nil
     render :partial => "stories/form", :locals => { :story => @story, :form => form  }
@@ -16,6 +15,7 @@ describe "/stories/_form.html.erb" do
       :bucket_id => 90,
       :description => nil,
       :points => 100,
+      :possible_statuses => [],
       :priority_id => 105,
       :responsible_party_type_id => 110,
       :status_id => 120,
@@ -25,7 +25,6 @@ describe "/stories/_form.html.erb" do
     @buckets = stub("buckets", :find => [])
     @users = stub("users", :find => [])
     @project = mock_model(Project, :buckets => @buckets, :users => @users)
-    @statuses = []
     @priorities = []
   end
 
@@ -70,7 +69,8 @@ describe "/stories/_form.html.erb" do
   end
   
   it "has a statuses dropdown select" do
-    @statuses = [["Complete", 1], ["Not complete", 2]]
+    statuses = [["Complete", 1], ["Not complete", 2]]
+    @story.stub!(:possible_statuses).and_return(statuses)
     render_it
     response.should have_tag('select#story_status_id') do
       with_tag('option[value=?]', 1, "Complete")
