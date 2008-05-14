@@ -43,6 +43,16 @@ class Story < ActiveRecord::Base
     end
   end
 
+  def self.reorder(story_ids)
+    story_ids = story_ids.dup.delete_if{ |id| id.blank? }
+    values = []
+    story_ids.each_with_index { |id,i| values << [id, i+1] }
+    columns2import = [:id, :position]
+    columns2update = [:position]
+    Story.import(columns2import, values, :on_duplicate_key_update => columns2update, :validate=>false )
+  end
+
+
   def name
     summary
   end

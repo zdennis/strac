@@ -131,3 +131,26 @@ describe Story, "when a story is completed" do
   end
 
 end
+
+describe Story, ".reorder" do
+  before do
+    Story.delete_all
+    @stories = [ Generate.story, Generate.story, Generate.story ]
+  end
+  
+  it "reorders the stories matching the passed in story ids to be in the same position" do
+    Story.reorder([@stories[2].id, @stories[1].id, @stories[0].id])
+    @stories.reverse.each_with_index do |story, i|
+      story.reload.position.should == i+1
+    end
+  end
+
+  describe "when a blank entry is given inside the story_ids" do
+    it "ignores it, and does not use it when reordering" do
+      Story.reorder(["", @stories.first.id, "", @stories.last.id, "", @stories[1].id])
+      @stories.first.reload.position.should == 1
+      @stories.last.reload.position.should == 2
+      @stories[1].reload.position.should == 3
+    end
+  end
+end

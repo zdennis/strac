@@ -39,12 +39,7 @@ describe StoriesController, '#reorder' do
   end
 
   it "reorders the stories" do
-    Story.should_receive(:import).with(
-      [:id, :position], 
-      [["3", 1], ["2", 2], ["1", 3]], 
-      :on_duplicate_key_update => [:position],
-      :validate => false
-    )
+    Story.should_receive(:reorder).with(@story_ids)
     xhr_put_reorder
   end
   
@@ -67,7 +62,7 @@ describe StoriesController, '#reorder' do
   describe "when reordering the stories is not successful" do
     before do
       controller.expect_render(:update).and_yield(@page)
-      Story.stub!(:import).and_raise(StandardError)
+      Story.stub!(:reorder).and_raise(StandardError)
     end
 
     it "tells the user the story failed to update" do
