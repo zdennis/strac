@@ -1,0 +1,2 @@
+class StoryPresenter < PresentationObject
+end
