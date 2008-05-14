@@ -32,7 +32,6 @@ class StoriesController < ApplicationController
 
   def create
     @story = @project.stories.build(params[:story])
-    find_priorities_and_statuses
     respond_to do |format|
       format.js do
         render :action => "stories/new" unless @story.save
@@ -56,7 +55,6 @@ class StoriesController < ApplicationController
           render :action => 'edit'
         end
         format.js do
-          find_priorities_and_statuses
           render :template => "stories/edit.js.rjs"
         end
       end
@@ -160,11 +158,6 @@ class StoriesController < ApplicationController
   end
 
 private
-
-  def find_priorities_and_statuses
-    @statuses = Status.find(:all).map{ |s| [s.name, s.id] }.unshift []
-    @priorities = Priority.find(:all).map{ |e| [e.name, e.id] }.unshift []
-  end
 
   def find_project
     unless @project=ProjectPermission.find_project_for_user(params[:project_id], current_user)

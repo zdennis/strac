@@ -33,20 +33,6 @@ describe StoriesController, '#create' do
     end
   end
 
-  it "finds all statuses and assigns them to @statuses" do
-    statuses = [mock_model(Status, :name => "a"), mock_model(Status, :name => "b")]
-    Status.should_receive(:find).with(:all).and_return(statuses)
-    xhr_post_create
-    assigns[:statuses].should == [[], [statuses.first.name, statuses.first.id ], [statuses.last.name, statuses.last.id]]
-  end
-  
-  it "finds all priorities and assigns them to @priorities" do
-    priorities = [mock_model(Priority, :name => "foo"), mock_model(Priority, :name => "bar")]
-    Priority.should_receive(:find).with(:all).and_return(priorities)
-    xhr_post_create
-    assigns[:priorities].should == [[], [priorities.first.name, priorities.first.id], [priorities.last.name, priorities.last.id]]
-  end    
-
   it "builds and assigns a @story for the project" do
     @project.should_receive(:stories).and_return(@stories)
     @stories.should_receive(:build).with(@story_params).and_return(@story)

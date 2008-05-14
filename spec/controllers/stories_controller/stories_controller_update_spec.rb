@@ -112,21 +112,6 @@ describe StoriesController, '#update' do
         xhr_put_update
         response.should render_template('stories/edit.js.rjs')
       end
-
-      it "finds all statuses and assigns them to @statuses" do
-        statuses = [mock_model(Status, :name => "a"), mock_model(Status, :name => "b")]
-        Status.should_receive(:find).with(:all).and_return(statuses)
-        xhr_put_update
-        assigns[:statuses].should == [[], [statuses.first.name, statuses.first.id ], [statuses.last.name, statuses.last.id]]
-      end
-    
-      it "finds all priorities and assigns them to @priorities" do
-        priorities = [mock_model(Priority, :name => "foo"), mock_model(Priority, :name => "bar")]
-        Priority.should_receive(:find).with(:all).and_return(priorities)
-        xhr_put_update
-        assigns[:priorities].should == [[], [priorities.first.name, priorities.first.id], [priorities.last.name, priorities.last.id]]
-      end
     end
-
   end
 end
