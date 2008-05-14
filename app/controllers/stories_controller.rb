@@ -75,12 +75,7 @@ class StoriesController < ApplicationController
   end
 
   def reorder
-    story_ids = params["iteration_nil"].delete_if{ |id| id.blank? }
-    values = []
-    story_ids.each_with_index { |id,i| values << [id, i+1] }
-    columns2import = [:id, :position]
-    columns2update = [:position]
-    Story.import(columns2import, values, :on_duplicate_key_update => columns2update, :validate=>false )
+    story_ids = reorder_stories(params["iteration_nil"])
     render_notice "Priorities have been successfully updated."
   rescue
     render_error "There was an error while updating priorities. If the problem persists, please contact technical support."
@@ -168,5 +163,14 @@ private
       end
       false
     end
+  end
+  
+  def reorder_stories(story_ids)
+    story_ids = story_ids.dup.delete_if{ |id| id.blank? }
+    values = []
+    story_ids.each_with_index { |id,i| values << [id, i+1] }
+    columns2import = [:id, :position]
+    columns2update = [:position]
+    Story.import(columns2import, values, :on_duplicate_key_update => columns2update, :validate=>false )
   end
 end
