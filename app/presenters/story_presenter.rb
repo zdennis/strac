@@ -12,5 +12,9 @@ class StoryPresenter < PresentationObject
   declare :possible_statuses do
     Status.find(:all).map{ |status| [status.name, status.id] }.unshift []
   end
+
+  declare :possible_priorities do
+    Priority.find(:all).map{ |priority| [priority.name, priority.id] }.unshift []
+  end
   
 end

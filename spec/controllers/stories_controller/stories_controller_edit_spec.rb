@@ -13,24 +13,8 @@ describe StoriesController, '#edit' do
     ProjectPermission.stub!(:find_project_for_user).and_return(@project)
     @project.stub!(:stories).and_return(@stories)
     StoryPresenter.stub!(:new)
-    Status.stub!(:find).with(:all).and_return([])
-    Priority.stub!(:find).with(:all).and_return([])    
   end
 
-  it "finds and assigns statuses" do
-    statuses = [ mock_model(Status, :name => "Foo"), mock_model(Status, :name => "Baz") ]
-    Status.should_receive(:find).with(:all).and_return(statuses)
-    get_edit
-    assigns[:statuses].should == [ [], ["Foo", statuses.first.id], ["Baz", statuses.last.id] ]
-  end
-  
-  it "finds and assigns priorities" do
-    priorities = [ mock_model(Priority, :name => "Baz"), mock_model(Priority, :name => "Bar") ]
-    Priority.should_receive(:find).with(:all).and_return(priorities)
-    get_edit
-    assigns[:priorities].should == [ [], ["Baz", priorities.first.id], ["Bar", priorities.last.id] ]
-  end
-  
   describe "when a project can't be found" do
     before do
       ProjectPermission.stub!(:find_project_for_user).and_return(nil)

@@ -4,7 +4,6 @@ class StoriesController < ApplicationController
   in_place_edit_for :story, :points
   
   before_filter :find_project
-  before_filter :find_priorities_and_statuses, :only => [ :new, :edit ]
 
   helper :comments
 

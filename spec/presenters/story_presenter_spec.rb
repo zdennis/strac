@@ -20,5 +20,14 @@ describe StoryPresenter do
       @presenter.possible_statuses.should == [ [], ["Foo", statuses.first.id], ["Baz", statuses.last.id] ]
     end
   end
+
+  describe '#possible_priorities' do
+    it "returns the possible priorities for the story" do
+      priorities = [ mock_model(Priority, :name => "Foo"), mock_model(Priority, :name => "Baz") ]
+      Priority.should_receive(:find).with(:all).and_return(priorities)
+      @presenter.possible_priorities.should == [ [], ["Foo", priorities.first.id], ["Baz", priorities.last.id] ]
+    end
+  end
+
 end
 
