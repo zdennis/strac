@@ -22,9 +22,10 @@ class ProjectsController < ApplicationController
     show_trends = iteration_count > 1
     if show_trends
       xvalues = (1..iteration_count).to_a
-      _slope = slope(xvalues, points_remaining.values_at(*xvalues))
-      _intercept = intercept(_slope, xvalues, points_remaining)
-      trends = xvalues.inject([]) {|values, i| values << _intercept + i*_slope }
+      yvalues = points_remaining.values_at(*xvalues)
+      _slope = slope(xvalues, yvalues)
+      _intercept = intercept(_slope, xvalues, yvalues)
+      trends = (0..iteration_count).inject([]) {|values, i| values << _intercept + i*_slope }
     end
      
     step_count = 6
