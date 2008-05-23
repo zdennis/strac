@@ -18,4 +18,10 @@ class ProjectChartPresenter < PresentationObject
     total_points << @project.total_points
     total_points
   end
+  
+  declare :points_remaining do
+    remaining_points = iterations.map{|iteration| iteration.snapshot.remaining_points}
+    remaining_points << @project.remaining_points
+    remaining_points
+  end
 end
