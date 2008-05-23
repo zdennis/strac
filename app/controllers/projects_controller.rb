@@ -13,7 +13,7 @@ class ProjectsController < ApplicationController
     show_trends = iteration_count > 1
     if show_trends
       xvalues = (1..iteration_count).to_a
-      yvalues = @project_chart_presenter.points_remaining.values_at(*xvalues)
+      yvalues = @project_chart_presenter.remaining_points.values_at(*xvalues)
       _slope = slope(xvalues, yvalues)
       _intercept = intercept(_slope, xvalues, yvalues)
       trends = (0..iteration_count).inject([]) {|values, i| values << _intercept + i*_slope }
@@ -21,7 +21,7 @@ class ProjectsController < ApplicationController
      
     step_count = 6
     min = 0
-    max = (@project_chart_presenter.points_completed + @project_chart_presenter.total_points + @project_chart_presenter.points_remaining).map(&:to_i).max
+    max = (@project_chart_presenter.completed_points + @project_chart_presenter.total_points + @project_chart_presenter.remaining_points).map(&:to_i).max
     step = [max / step_count.to_f, 1].max
     ylabels = []
     min.step(max, step) { |f| ylabels << f.round }
@@ -33,7 +33,7 @@ class ProjectsController < ApplicationController
     blue = '0000FF'
     purple = 'a020f0'
     
-    data =   [@project_chart_presenter.total_points, @project_chart_presenter.points_completed, @project_chart_presenter.points_remaining]
+    data =   [@project_chart_presenter.total_points, @project_chart_presenter.completed_points, @project_chart_presenter.remaining_points]
     colors = [blue,         green,            purple]
     legend = ["Total Points", "Total Points Completed", "Points Remaining"]
     

@@ -7,10 +7,10 @@ class ProjectChartPresenter < PresentationObject
     @project.iterations.sort_by{ |iteration| iteration.started_at }
   end
   
-  declare :points_completed do
-    points_completed = iterations.map{|iteration| iteration.snapshot.completed_points}
-    points_completed << @project.completed_points
-    points_completed
+  declare :completed_points do
+    completed_points = iterations.map{|iteration| iteration.snapshot.completed_points}
+    completed_points << @project.completed_points
+    completed_points
   end
   
   declare :total_points do
@@ -19,7 +19,7 @@ class ProjectChartPresenter < PresentationObject
     total_points
   end
   
-  declare :points_remaining do
+  declare :remaining_points do
     remaining_points = iterations.map{|iteration| iteration.snapshot.remaining_points}
     remaining_points << @project.remaining_points
     remaining_points
