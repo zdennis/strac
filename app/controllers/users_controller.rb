@@ -28,7 +28,6 @@ class UsersController < ApplicationController
   end
   
   before_filter :assign_group, :only => [:signup]
-  before_filter :find_groups, :only => [:profile]
   
 private
 
@@ -56,13 +55,5 @@ private
       params[:user][:group_id] = Group.find_by_name("Developer").id
       params[:user][:active] = true
     end
-  end
-  
-  def find_groups
-    @groups = Group.find(:all, :conditions => { :name => current_user.group.groups }).map { |c| [c.name, c.id] }
-    if @user and not @user.new_record? and @user != current_user
-      @groups << [@user.group.name, @user.group.id]
-    end
-    @groups.uniq!
-  end
+  end  
 end
