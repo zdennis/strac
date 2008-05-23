@@ -51,7 +51,7 @@ class ProjectChartPresenter < PresentationObject
     iterations.map{ |e| iterations.index(e) } + ["current"]
   end
   
-  declare :dark_remaining_points_color do
+  declare :remaining_points_color do
     '551a8b'
   end
   
