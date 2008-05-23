@@ -5,10 +5,6 @@ class ProjectsController < ApplicationController
     @project=ProjectPermission.find_project_for_user(params[:id], current_user)
     @project_chart_presenter = ProjectChartPresenter.new @project
     
-    trends = []
-        
-    iterations = @project.iterations.sort_by{ |iteration| iteration.started_at }
-     
     data =   [
       @project_chart_presenter.total_points, 
       @project_chart_presenter.completed_points, 
