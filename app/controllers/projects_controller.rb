@@ -106,12 +106,11 @@ class ProjectsController < ApplicationController
 
   def destroy
     if @project=ProjectPermission.find_project_for_user(params[:id], current_user)
-      @project
+      @project.destroy
+      redirect_to projects_path
     else
       redirect_to "/access_denied.html"
     end
-    @project.destroy
-    redirect_to projects_path
   end
   
   def workspace
