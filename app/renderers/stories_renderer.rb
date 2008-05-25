@@ -1,0 +1,2 @@
+class StoriesRenderer < Renderer
+end

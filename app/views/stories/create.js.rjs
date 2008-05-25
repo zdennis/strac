@@ -4,6 +4,9 @@ page[:notice].show
 page.visual_effect :appear, :notice
 page.delay( 5 ) {  page.visual_effect :fade, :notice }
 
+render_with :stories do |stories|
+end
+
 bucket_id = "iteration_#{@story.bucket ? @story.bucket.id : 'nil'}"
 page.insert_html :bottom, bucket_id, :partial => 'list', :locals => { :stories => [ @story ] }
 
