@@ -71,7 +71,6 @@ describe Iteration, "#points_completed" do
   
   describe "with no stories" do
     before do
-      Iteration.destroy_all
       Story.destroy_all
     end
 
