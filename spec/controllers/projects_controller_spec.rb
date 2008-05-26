@@ -313,7 +313,7 @@ describe ProjectsController, '#destroy' do
   
   describe "when the user doesn't have access to the project" do
     before do
-      ProjectPermission.stub!(:find_project_for_user).and_raise(AccessDenied)
+      ProjectPermission.stub!(:find_project_for_user).and_return(nil)
     end
     
     it "redirects to the access denied page" do

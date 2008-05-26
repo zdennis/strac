@@ -16,10 +16,6 @@ class ApplicationController < ActionController::Base
     redirect_to dashboard_path
   end
   
-  rescue_from AccessDenied, ResourceNotFoundError do |exception|
-    redirect_to "/access_denied.html"
-  end
-
 private
 
   def render_error(msg)
