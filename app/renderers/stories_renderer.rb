@@ -15,6 +15,10 @@ class StoriesRenderer < Renderer
     page[story_form_id].replace_html :partial => 'stories/new', :locals => { :story => blank_story }    
   end
   
+  def draw_velocity_markers
+    page.call "Strac.Iteration.drawWorkspaceVelocityMarkers"
+  end
+  
   private
   
   def bucket_element_id(bucket_id)

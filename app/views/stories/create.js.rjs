@@ -8,6 +8,5 @@ render_with :stories do |stories|
   stories.add_to_story_list @story
   stories.make_new_story_sortable_in_project @story, @project
   stories.clear_new_story_form @story.bucket_id
+  stories.draw_velocity_markers
 end
-
-page.call "Strac.Iteration.drawWorkspaceVelocityMarkers"
