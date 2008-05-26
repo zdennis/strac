@@ -1,2 +1,0 @@
-class AccessDenied < StandardError
-end
