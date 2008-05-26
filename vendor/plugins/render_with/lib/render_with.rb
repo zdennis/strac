@@ -3,13 +3,9 @@ class Renderer
 
   attr_reader :page
   
-  def initialize(page=nil, context=nil)
-    if context
-      @context = context
-      
-      # allow an array of assignments to be passed in for testing
-      assigns = context.is_a?(Hash) ? context : context.assigns
-      
+  def initialize(page=nil, assigns=nil, context=nil)
+    @context = context
+    if assigns
       assigns.each_pair do |key,value|
         instance_variable_set "@#{key}", value
       end
@@ -38,15 +34,19 @@ end
 class ActionView::Base
   def render_with(renderer_name, &block)
     page = eval("page", block.binding)
-    renderer = "#{renderer_name}_renderer".classify.constantize.new(page, @template)
+    renderer = "#{renderer_name}_renderer".classify.constantize.new(page, @template.assigns, @template)
     yield renderer
   end
 end
 
 # Alternative way to use render_with. Doesn't rely on eval voodoo.
-# module ActionView::Helpers::PrototypeHelper::JavaScriptGenerator::GeneratorMethods
-#   def render_with(renderer_name, &block)
-#     renderer = "#{renderer_name}_renderer".classify.constantize.new(self, @context)
-#     yield renderer
-#   end
+# example use:
+# page.render_with :foo do |foo|
+#   foo.do_something_cool
 # end
+module ActionView::Helpers::PrototypeHelper::JavaScriptGenerator::GeneratorMethods
+  def render_with(renderer_name, &block)
+    renderer = "#{renderer_name}_renderer".classify.constantize.new(self, @context.assigns, @context)
+    yield renderer
+  end
+end
