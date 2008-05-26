@@ -1,8 +1,6 @@
-page[:notice].replace_html %("#{@story.summary}" was successfully created.)
-page[:error].hide
-page[:notice].show
-page.visual_effect :appear, :notice
-page.delay( 5 ) {  page.visual_effect :fade, :notice }
+render_with :site do |site|
+  site.show_notice %("#{@story.summary}" was successfully created.)
+end
 
 render_with :stories do |stories|
   stories.add_to_story_list @story

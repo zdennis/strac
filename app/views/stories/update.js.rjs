@@ -1,8 +1,6 @@
-page[:notice].replace_html %("#{h(@story.summary)}" was successfully updated.)
-page[:error].hide
-page[:notice].show
-page.visual_effect :appear, :notice
-page.delay( 5 ) {  page.visual_effect :fade, :notice }
+render_with :site do |site|
+  site.show_notice %("#{h(@story.summary)}" was successfully updated.)
+end
 
 # TODO - find a better way to determine when to remove stories
 viewing_phases = request.referer =~ /projects\/.+\/phases/ ? true : false
