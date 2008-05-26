@@ -1,2 +1,0 @@
-class ResourceNotFoundError < StandardError
-end
