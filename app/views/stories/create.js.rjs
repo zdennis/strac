@@ -7,10 +7,7 @@ page.delay( 5 ) {  page.visual_effect :fade, :notice }
 render_with :stories do |stories|
   stories.add_to_story_list @story
   stories.make_new_story_sortable_in_project @story, @project
+  stories.clear_new_story_form @story
 end
 
-bucket_id = "iteration_#{@story.bucket ? @story.bucket.id : 'nil'}"
-
-@story = Story.new :bucket_id => @story.bucket_id # we want a fresh form
-page["#{bucket_id}_story_new"].replace_html :partial => 'stories/new', :locals => { :story => @story }
 page.call "Strac.Iteration.drawWorkspaceVelocityMarkers"

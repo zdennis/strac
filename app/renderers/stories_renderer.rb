@@ -9,6 +9,11 @@ class StoriesRenderer < Renderer
                                 :tag => 'div', :handle => 'draggable', :dropOnEmpty => true, :containment => iteration_list_ids
   end
   
+  def clear_new_story_form story
+    blank_story = Story.new :bucket_id => story.bucket_id # we want a fresh form
+    page["#{bucket_id(story)}_story_new"].replace_html :partial => 'stories/new', :locals => { :story => blank_story }    
+  end
+  
   private
   
   def bucket_id(story)
