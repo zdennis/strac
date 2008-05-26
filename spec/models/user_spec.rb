@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
 describe User do
-  before do
+  before(:each) do
     @user = Generate.user :email_address => "joe@example.com"
   end
   
