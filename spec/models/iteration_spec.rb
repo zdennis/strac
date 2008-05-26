@@ -168,9 +168,9 @@ describe Iteration, '#display_name' do
     @ended_at = Time.now
   end
   
-  describe "with a blank name" do
+  describe "an iteration with a blank name that has been completed" do
     before do
-      @iteration = Iteration.new :started_at => @started_at, :ended_at => @ended_at
+      @iteration = Iteration.new :started_at => @started_at, :ended_at => @ended_at, :name => ""
     end
     
     it "returns a string in the form of 'YY-MM-DD through YY-MM-DD" do
@@ -178,8 +178,19 @@ describe Iteration, '#display_name' do
       n.should == @started_at.strftime( "%Y-%m-%d" ) + " through " + @ended_at.strftime( "%Y-%m-%d" )
     end
   end
+
+  describe "an iteration with a blank name that is still in progress" do
+    before do
+      @iteration = Iteration.new :started_at => @started_at, :ended_at => nil, :name => ""
+    end
+    
+    it "returns a string in the form of 'YY-MM-DD through Now" do
+      n = @iteration.display_name
+      n.should == @started_at.strftime( "%Y-%m-%d" ) + " through Now"
+    end
+  end
   
-  describe "with a name" do
+  describe "an iteration with a name that has been completed" do
     before do
       @name = "FooBaz"
       @iteration = Iteration.new :name => @name, :started_at => @started_at, :ended_at => @ended_at
@@ -188,6 +199,19 @@ describe Iteration, '#display_name' do
     it "returns a string in the form of 'name (YY-MM-DD through YY-MM-DD)" do
       n = @iteration.display_name
       n.should == "#{@name} (#{@started_at.strftime( "%Y-%m-%d" )} through #{@ended_at.strftime( "%Y-%m-%d" )})"    
+    end
+  end
+
+
+  describe "an iteration with a name that is still in progress" do
+    before do
+      @name = "FooBaz"
+      @iteration = Iteration.new :name => @name, :started_at => @started_at, :ended_at => nil
+    end
+    
+    it "returns a string in the form of 'name (YY-MM-DD through Now)" do
+      n = @iteration.display_name
+      n.should == "#{@name} (#{@started_at.strftime( "%Y-%m-%d" )} through Now)"    
     end
   end
 end
