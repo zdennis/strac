@@ -11,8 +11,14 @@ steps_for :a_user_creating_a_story do
   end
   
   When "the user creates a story" do
-    post stories_path(@project), 
-      :story => {:summary => "My Story"}
+    post stories_path(@project), :story => {:summary => "My Story"}
+  end
+  When "the user updates a story without enough information" do
+    put story_path(@project, @project.stories.first), :story => { :summary => "" }
+  end
+  When "the user updates a story with enough information" do
+    put story_path(@project, @project.stories.first), :story => { :summary => "Updated Summary", :description => "" }
+    follow_redirect! while response.redirect?
   end
   
   Then "the user is notified of success" do
@@ -20,6 +26,13 @@ steps_for :a_user_creating_a_story do
     response.should have_rjs(:hide, "error")
     response.should have_rjs(:show, "notice")
   end
+  Then "the user is notified that the story was updated" do
+    response.should have_tag('#notice', /Updated Summary.*updated/)
+  end
+  Then "the user is notified of errors" do
+    see_errors "There were problems with the following fields".to_regexp
+  end
+  
   
   Then "the story list is updated" do
     response.should have_rjs(:insert_html, :bottom, "iteration_nil", /My Story/)

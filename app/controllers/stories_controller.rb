@@ -54,6 +54,7 @@ class StoriesController < ApplicationController
         format.js { render :template => "stories/update.js.rjs" }
       else
         format.html do
+          find_priorities_and_statuses
           render :action => 'edit'
         end
         format.js do
