@@ -6,11 +6,12 @@ describe StoriesController, '#reorder' do
   end
   
   before do
+    Story.delete_all
+    @stories = [ Generate.story, Generate.story, Generate.story ]
     stub_login_for StoriesController
     @project = mock_model(Project)
-    @story_ids = [ "3", "2", "", "1"]
+    @story_ids = @stories.map(&:id)
     @page = stub("page", :delay => nil, :visual_effect => nil, :replace_html => nil, :replace => nil, :hide => nil, :show => nil )
-    Story.stub!(:import)
     ProjectPermission.stub!(:find_project_for_user).and_return(@project)
   end
 
@@ -38,14 +39,20 @@ describe StoriesController, '#reorder' do
     end
   end
 
-  it "reorders the stories" do
-    Story.should_receive(:import).with(
-      [:id, :position], 
-      [["3", 1], ["2", 2], ["1", 3]], 
-      :on_duplicate_key_update => [:position],
-      :validate => false
-    )
-    xhr_put_reorder
+  it "reorders the stories matching the passed in story ids to be in the same position" do
+    xhr_put_reorder "iteration_nil" => [@stories[2].id, @stories[1].id, @stories[0].id]
+    @stories.reverse.each_with_index do |story, i|
+      story.reload.position.should == i+1
+    end
+  end
+
+  describe "when a blank entry is given inside the story_ids" do
+    it "ignores it, and does not use it when reordering" do
+      xhr_put_reorder "iteration_nil" => ["", @stories.first.id, "", @stories.last.id, "", @stories[1].id]
+      @stories.first.reload.position.should == 1
+      @stories.last.reload.position.should == 2
+      @stories[1].reload.position.should == 3
+    end
   end
   
   describe "when reordering the stories is successful" do
