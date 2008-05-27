@@ -1,4 +1,4 @@
-steps_for :a_user_creating_a_story do
+steps_for :a_user_crudding_a_story do
   Given "there is a project with stories" do
     @project = Generate.project
     @stories = Generate.stories :count => 10, :project => @project

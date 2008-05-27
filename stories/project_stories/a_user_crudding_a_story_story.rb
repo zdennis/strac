@@ -1,9 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + "/../helper")
 
-Story "Creating Stories", %|
+Story "CRUD'ing Stories", %|
   As a User
-  I want to be able to create stories.|, 
-  :steps_for => [:a_user_creating_a_story],
+  I want to be able to CRUD stories.|, 
+  :steps_for => [:a_user_crudding_a_story],
   :type => RailsStory do
 
   Scenario "a user with access creates a story" do
