@@ -1,68 +1,6 @@
 class ProjectsController < ApplicationController
   restrict_to :user
   
-  def chart
-    @project=ProjectPermission.find_project_for_user(params[:id], current_user)
-    total_points = []
-    points_completed = []
-    points_remaining = []
-    trends = []
-    
-    iterations = @project.iterations.sort_by{ |iteration| iteration.started_at }
-    iterations.each do |iteration|
-      points_completed << iteration.snapshot.completed_points
-      points_remaining << iteration.snapshot.remaining_points
-      total_points << iteration.snapshot.total_points
-    end
-    points_completed << @project.completed_points
-    points_remaining << @project.remaining_points
-    total_points << @project.total_points
-    
-    iteration_count = iterations.size
-    show_trends = iteration_count > 1
-    if show_trends
-      xvalues = (1..iteration_count).to_a
-      _slope = slope(xvalues, points_remaining.values_at(*xvalues))
-      _intercept = intercept(_slope, xvalues, points_remaining)
-      trends = xvalues.inject([]) {|values, i| values << _intercept + i*_slope }
-    end
-     
-    step_count = 6
-    min = 0
-    max = (points_completed + total_points + points_remaining).map(&:to_i).max
-    step = [max / step_count.to_f, 1].max
-    ylabels = []
-    min.step(max, step) { |f| ylabels << f.round }
-    xlabels = iterations.map{ |e| iterations.index(e) } + ["current"]
-
-    red = 'FF0000'
-    dark_purple = '551a8b'
-    green = '00FF00'
-    blue = '0000FF'
-    purple = 'a020f0'
-    
-    data =   [total_points, points_completed, points_remaining]
-    colors = [blue,         green,            purple]
-    legend = ["Total Points", "Total Points Completed", "Points Remaining"]
-    
-    if show_trends
-      data << trends
-      colors << dark_purple
-      legend << "Points Remaining Trend"
-    end
-    
-    chart = Gchart.new(
-     :data =>       data, 
-     :bar_colors => colors,
-     :size => "600x200",
-     :axis_with_labels => ["x", "y"],
-     :axis_labels => [xlabels, ylabels],
-     :legend => legend
-    )
-    
-    render :text => chart.send!(:fetch)
-  end
-
   def index
     @projects = ProjectPermission.find_all_projects_for_user(current_user)
     redirect_to "/access_denied.html" unless @projects
@@ -127,6 +65,69 @@ class ProjectsController < ApplicationController
     else
       redirect_to "/access_denied.html"
     end
+  end
+
+  def chart
+    @project=ProjectPermission.find_project_for_user(params[:id], current_user)
+    total_points = []
+    points_completed = []
+    points_remaining = []
+    trends = []
+    
+    iterations = @project.iterations.sort_by{ |iteration| iteration.started_at }
+    iterations.each do |iteration|
+      points_completed << iteration.snapshot.completed_points
+      points_remaining << iteration.snapshot.remaining_points
+      total_points << iteration.snapshot.total_points
+    end
+    points_completed << @project.completed_points
+    points_remaining << @project.remaining_points
+    total_points << @project.total_points
+    
+    iteration_count = iterations.size
+    show_trends = iteration_count > 1
+    if show_trends
+      xvalues = (1..iteration_count).to_a
+      yvalues = points_remaining.values_at(*xvalues)
+      _slope = slope(xvalues, yvalues)
+      _intercept = intercept(_slope, xvalues, yvalues)
+      trends = (0..iteration_count).inject([]) {|values, i| values << _intercept + i*_slope }
+    end
+     
+    step_count = 6
+    min = 0
+    max = (points_completed + total_points + points_remaining).map(&:to_i).max
+    step = [max / step_count.to_f, 1].max
+    ylabels = []
+    min.step(max, step) { |f| ylabels << f.round }
+    xlabels = iterations.map{ |e| iterations.index(e) } + ["current"]
+
+    red = 'FF0000'
+    dark_purple = '551a8b'
+    green = '00FF00'
+    blue = '0000FF'
+    purple = 'a020f0'
+    
+    data =   [total_points, points_completed, points_remaining]
+    colors = [blue,         green,            purple]
+    legend = ["Total Points", "Total Points Completed", "Points Remaining"]
+    
+    if show_trends
+      data << trends
+      colors << dark_purple
+      legend << "Points Remaining Trend"
+    end
+    
+    chart = Gchart.new(
+     :data =>       data, 
+     :bar_colors => colors,
+     :size => "600x200",
+     :axis_with_labels => ["x", "y"],
+     :axis_labels => [xlabels, ylabels],
+     :legend => legend
+    )
+    
+    render :text => chart.send!(:fetch)
   end
   
   private
