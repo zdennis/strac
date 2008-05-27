@@ -23,7 +23,7 @@ steps_for :a_user_creating_a_story do
   
   Then "the story list is updated" do
     response.should have_rjs(:insert_html, :bottom, "iteration_nil", /My Story/)
-    response.should have_rjs(:chained_replace_html, "iteration_nil_story_new"){|matches|
+    response.should have_rjs(:chained_replace_html, "iteration_nil_story_new"){
       with_tag("input[value=?]", "My Story", false)
     }
     response.body.should match(/Strac.Iteration.drawWorkspaceVelocityMarkers/)
