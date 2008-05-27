@@ -78,4 +78,20 @@ class ProjectChartPresenter < PresentationObject
     data
   end
   
+  declare :colors do
+    colors = [
+      total_points_color,         
+      completed_points_color,            
+      remaining_points_color
+    ]
+    colors << remaining_points_trend_color if show_trends?
+    colors
+  end
+  
+  declare :legend do
+    legend = ["Total Points", "Total Points Completed", "Points Remaining"]
+    legend << "Points Remaining Trend" if show_trends?
+    legend
+  end
+  
 end

@@ -6,18 +6,8 @@ class ProjectsController < ApplicationController
     @project_chart_presenter = ProjectChartPresenter.new @project
     
     data = @project_chart_presenter.data
-    colors = [
-      @project_chart_presenter.total_points_color,         
-      @project_chart_presenter.completed_points_color,            
-      @project_chart_presenter.remaining_points_color
-    ]
-    
-    legend = ["Total Points", "Total Points Completed", "Points Remaining"]
-    
-    if @project_chart_presenter.show_trends?
-      colors << @project_chart_presenter.remaining_points_trend_color
-      legend << "Points Remaining Trend"
-    end
+    colors = @project_chart_presenter.colors
+    legend = @project_chart_presenter.legend
     
     chart = Gchart.new(
      :data =>       data, 
