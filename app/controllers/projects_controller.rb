@@ -5,11 +5,7 @@ class ProjectsController < ApplicationController
     @project=ProjectPermission.find_project_for_user(params[:id], current_user)
     @project_chart_presenter = ProjectChartPresenter.new @project
     
-    data =   [
-      @project_chart_presenter.total_points, 
-      @project_chart_presenter.completed_points, 
-      @project_chart_presenter.remaining_points
-    ]
+    data = @project_chart_presenter.data
     colors = [
       @project_chart_presenter.total_points_color,         
       @project_chart_presenter.completed_points_color,            
@@ -19,7 +15,6 @@ class ProjectsController < ApplicationController
     legend = ["Total Points", "Total Points Completed", "Points Remaining"]
     
     if @project_chart_presenter.show_trends?
-      data << @project_chart_presenter.trends
       colors << @project_chart_presenter.remaining_points_trend_color
       legend << "Points Remaining Trend"
     end

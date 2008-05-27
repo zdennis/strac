@@ -67,4 +67,15 @@ class ProjectChartPresenter < PresentationObject
     'a020f0'
   end
   
+  declare :data do
+    data = [
+      total_points, 
+      completed_points, 
+      remaining_points
+    ]
+    
+    data << trends if show_trends?
+    data
+  end
+  
 end
