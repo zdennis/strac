@@ -83,10 +83,6 @@ class Project < ActiveRecord::Base
     WHERE
       projects.id = #{id} AND
       taggings.taggable_id IS NULL'
-
-  def incomplete_stories
-    stories.find(:all, :conditions => ["status_id NOT IN(?) OR status_id IS NULL", Status.complete], :order => "position ASC")
-  end
   
   def iterations_ordered_by_started_at
     iterations.find(:all, :order => :started_at)

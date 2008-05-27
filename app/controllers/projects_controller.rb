@@ -115,7 +115,10 @@ class ProjectsController < ApplicationController
   
   def workspace
     if @project=ProjectPermission.find_project_for_user(params[:id], current_user)
-      @stories = @project.incomplete_stories
+      @stories = @project.stories.find(
+        :all, 
+        :conditions => ["status_id NOT IN(?) OR status_id IS NULL", Status.complete], :order => "position ASC"
+      )
     else
       redirect_to "/access_denied.html"
     end
