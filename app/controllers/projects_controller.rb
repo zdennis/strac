@@ -5,17 +5,13 @@ class ProjectsController < ApplicationController
     @project=ProjectPermission.find_project_for_user(params[:id], current_user)
     @project_chart_presenter = ProjectChartPresenter.new @project
     
-    data = @project_chart_presenter.data
-    colors = @project_chart_presenter.colors
-    legend = @project_chart_presenter.legend
-    
     chart = Gchart.new(
-     :data =>       data, 
-     :bar_colors => colors,
+     :data =>       @project_chart_presenter.data, 
+     :bar_colors => @project_chart_presenter.colors,
      :size => "600x200",
      :axis_with_labels => ["x", "y"],
      :axis_labels => [@project_chart_presenter.xlabels, @project_chart_presenter.ylabels],
-     :legend => legend
+     :legend => @project_chart_presenter.legend
     )
     
     render :text => chart.send!(:fetch)
