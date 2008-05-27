@@ -22,6 +22,7 @@ Story "Creating/Updating/Reading/Destroying a Project", %|
     
     When "they click the projects link"
     Then "they will see the project in the project list"
+    And "the system will send out an email to the project members"
   end
 
   Scenario "a user trying to view a project who doesn't have permission" do

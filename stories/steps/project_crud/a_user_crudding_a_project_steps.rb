@@ -102,4 +102,12 @@ steps_for :a_user_crudding_a_project_steps do
   Then "they will not see the destroyed project in the projects list" do
     response.should_not have_tag('.projects .project .name', @project.name.to_regexp)
   end
+  Then "the system will send out an email to the project members" do
+    email = ActionMailer::Base.deliveries.last
+    email.subject.should =~ "Successfully created project '#{@project.name}'".to_regexp
+    @project.users.each do |user|
+      email.to.should include(user.email_address)
+    end
+  end
+
 end

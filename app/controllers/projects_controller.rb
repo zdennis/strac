@@ -25,6 +25,7 @@ class ProjectsController < ApplicationController
     
     if @project.save 
       current_user.projects << @project
+      ProjectMailer.deliver_project_created_notification(@project, current_user)
       flash[:notice] = 'Project was successfully created.'
       redirect_to project_path(@project)
     else

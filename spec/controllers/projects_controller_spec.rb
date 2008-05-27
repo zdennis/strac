@@ -125,6 +125,7 @@ describe ProjectsController, "#create" do
   
   describe "when the project saves successfully" do
     before do
+      ProjectMailer.stub!(:deliver_project_created_notification)
       @project.stub!(:save).and_return(true)
       @user.stub!(:projects).and_return([])
     end
@@ -134,6 +135,14 @@ describe ProjectsController, "#create" do
       @user.should_receive(:projects).and_return(@projects)
       post_create
       @projects.should == [@project]
+    end
+    
+    it "sends out a notification to the members of the project" do
+      ProjectMailer.should_receive(:deliver_project_created_notification).with(
+        @project,
+        @user
+      )
+      post_create
     end
     
     it "sets the flash[:notice] telling the user the project was created" do
