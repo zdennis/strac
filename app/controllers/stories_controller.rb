@@ -4,7 +4,6 @@ class StoriesController < ApplicationController
   in_place_edit_for :story, :points
   
   before_filter :find_project
-  before_filter :find_priorities_and_statuses, :only => [ :new, :edit ]
 
   helper :comments
 
@@ -33,7 +32,6 @@ class StoriesController < ApplicationController
 
   def create
     story = @project.stories.build(params[:story])
-    find_priorities_and_statuses
     respond_to do |format|
       format.js do
         @story = StoryPresenter.new :story => story
@@ -54,12 +52,10 @@ class StoriesController < ApplicationController
         format.js { render :template => "stories/update.js.rjs" }
       else
         format.html do
-          find_priorities_and_statuses
           @story = StoryPresenter.new :story => @story
           render :action => 'edit'
         end
         format.js do
-          find_priorities_and_statuses
           @story = StoryPresenter.new :story => @story
           render :template => "stories/edit.js.rjs"
         end
@@ -164,11 +160,6 @@ class StoriesController < ApplicationController
   end
 
 private
-
-  def find_priorities_and_statuses
-    @statuses = Status.find(:all).map{ |s| [s.name, s.id] }.unshift []
-    @priorities = Priority.find(:all).map{ |e| [e.name, e.id] }.unshift []
-  end
 
   def find_project
     unless @project=ProjectPermission.find_project_for_user(params[:project_id], current_user)
