@@ -2,7 +2,7 @@
 
 <%= error_messages_for :story %>
 
-<% remote_form_for :story, :url => stories_path( @project ) do |form| -%>
+<% remote_form_for story, :url => stories_path( @project ) do |form| -%>
   <%= render :partial => 'form', :locals => { :form => form, :story => story } %>
   <p>
     <%= submit_tag "Create" %> or 
