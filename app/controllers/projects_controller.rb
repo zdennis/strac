@@ -20,7 +20,7 @@ class ProjectsController < ApplicationController
     
     if @project_chart_presenter.show_trends?
       data << @project_chart_presenter.trends
-      colors << @project_chart_presenter.remaining_points_color
+      colors << @project_chart_presenter.remaining_points_trend_color
       legend << "Points Remaining Trend"
     end
     
