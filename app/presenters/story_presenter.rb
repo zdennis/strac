@@ -11,6 +11,10 @@ class StoryPresenter
            :summary, :tag_list, 
            :to => :@story
   
+  def possible_priorities
+    Priority.find(:all).map{ |e| [e.name, e.id] }.unshift []
+  end
+  
   def possible_statuses
     Status.find(:all).map{ |s| [s.name, s.id] }.unshift []
   end
