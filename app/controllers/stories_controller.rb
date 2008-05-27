@@ -19,12 +19,12 @@ class StoriesController < ApplicationController
   end
 
   def new
-    @story = @project.stories.build
+    @story = StoryPresenter.new :story => @project.stories.build
     respond_to :js
   end
   
   def edit
-    @story = @project.stories.find(params[:id], :include => :tags)
+    @story = StoryPresenter.new :story => @project.stories.find(params[:id], :include => :tags)
     respond_to do |format|
       format.html
       format.js { render :action => 'edit' }
@@ -32,11 +32,12 @@ class StoriesController < ApplicationController
   end
 
   def create
-    @story = @project.stories.build(params[:story])
+    story = @project.stories.build(params[:story])
     find_priorities_and_statuses
     respond_to do |format|
       format.js do
-        render :action => "stories/new" unless @story.save
+        @story = StoryPresenter.new :story => story
+        render :action => "stories/new" unless story.save
       end
     end
   end
@@ -46,7 +47,6 @@ class StoriesController < ApplicationController
 
     respond_to do |format|
       if @story.update_attributes(params[:story])
-        #TODO: If this stories iteration is changed, then it should move
         format.html do 
           flash[:notice] = %("#{h(@story.summary)}" was successfully updated.)
           redirect_to story_path(@project, @story)
@@ -55,10 +55,12 @@ class StoriesController < ApplicationController
       else
         format.html do
           find_priorities_and_statuses
+          @story = StoryPresenter.new :story => @story
           render :action => 'edit'
         end
         format.js do
           find_priorities_and_statuses
+          @story = StoryPresenter.new :story => @story
           render :template => "stories/edit.js.rjs"
         end
       end
