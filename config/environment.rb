@@ -89,5 +89,5 @@ require 'constructor'
 require 'gchart'
 
 # working around an issue with has_many_polymorphs and rails reloading of classes
-require 'vendor/plugins/acts_as_taggable_on_steroids/lib/tag'
-require 'app/models/tag'
+require "#{RAILS_ROOT}/vendor/plugins/acts_as_taggable_on_steroids/lib/tag"
+require "#{RAILS_ROOT}/app/models/tag"
