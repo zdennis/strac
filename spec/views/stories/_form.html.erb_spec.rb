@@ -22,9 +22,8 @@ describe "/stories/_form.html.erb" do
       :summary => nil, 
       :tag_list => nil
     )
-    @buckets = stub("buckets", :find => [])
     @users = stub("users", :find => [])
-    @project = mock_model(Project, :buckets => @buckets, :users => @users)
+    @project = mock_model(Project, :buckets => [], :users => @users)
     @statuses = []
     @priorities = []
   end
@@ -105,8 +104,7 @@ describe "/stories/_form.html.erb" do
       mock_model(Bucket, :name => "Iteration 1", :type => "Iteration"), 
       mock_model(Bucket, :name => "Phase 1", :type => "Phase")
     ]
-    @project.should_receive(:buckets).and_return(@buckets)
-    @buckets.should_receive(:find).with(:all, :order => :started_at).and_return(my_buckets)
+    @project.should_receive(:buckets).and_return(my_buckets)
     @story.stub!(:bucket_id).and_return(my_buckets.last.id)
     render_it
     response.should have_tag('select[name=?]', 'story[bucket_id]') do
