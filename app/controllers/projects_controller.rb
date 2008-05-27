@@ -65,6 +65,7 @@ class ProjectsController < ApplicationController
 
   def index
     @projects = ProjectPermission.find_all_projects_for_user(current_user)
+    redirect_to "/access_denied.html" unless @projects
   end
 
   def show
@@ -95,12 +96,16 @@ class ProjectsController < ApplicationController
 
   def update
     @project = ProjectPermission.find_project_for_user(params[:id], current_user)
-    if @project && @project.update_attributes(params[:project])
-      @project.update_members params[:users]
-      flash[:notice] = 'Project was successfully updated.'
-      redirect_to project_path(@project)
+    if @project
+      if @project.update_attributes(params[:project])
+        @project.update_members params[:users]
+        flash[:notice] = 'Project was successfully updated.'
+        redirect_to project_path(@project)
+      else
+        render :action => "edit"
+      end      
     else
-      render :action => "edit"
+      redirect_to "/access_denied.html"
     end
   end
 
