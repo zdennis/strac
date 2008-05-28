@@ -1,22 +1,6 @@
 class ProjectsController < ApplicationController
   restrict_to :user
   
-  def chart
-    @project=ProjectPermission.find_project_for_user(params[:id], current_user)
-    @project_chart_presenter = ProjectChartPresenter.new @project
-    
-    chart = Gchart.new(
-     :data =>       @project_chart_presenter.data, 
-     :bar_colors => @project_chart_presenter.colors,
-     :size => "600x200",
-     :axis_with_labels => ["x", "y"],
-     :axis_labels => [@project_chart_presenter.xlabels, @project_chart_presenter.ylabels],
-     :legend => @project_chart_presenter.legend
-    )
-    
-    render :text => chart.send!(:fetch)
-  end
-
   def index
     @projects = ProjectPermission.find_all_projects_for_user(current_user)
   end
@@ -77,4 +61,20 @@ class ProjectsController < ApplicationController
   end
   
   private
+  
+  def chart
+    @project=ProjectPermission.find_project_for_user(params[:id], current_user)
+    @chart = Project::Chart.new @project
+    
+    chart = Gchart.new(
+     :data =>       @chart.data, 
+     :bar_colors => @chart.colors,
+     :size => "600x200",
+     :axis_with_labels => ["x", "y"],
+     :axis_labels => [@chart.xlabels, @chart.ylabels],
+     :legend => @chart.legend
+    )
+    
+    render :text => chart.send!(:fetch)
+  end
 end

@@ -1,4 +1,4 @@
-class ProjectChartPresenter < PresentationObject
+class Project::Chart < PresentationObject
   def initialize project
     @project = project
   end
